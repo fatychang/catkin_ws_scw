@@ -480,6 +480,19 @@ std_msgs_generate_messages_py/fast:
 .PHONY : std_msgs_generate_messages_py/fast
 
 #=============================================================================
+# Target rules for targets named doorway_detection_node
+
+# Build rule for target.
+doorway_detection_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 doorway_detection_node
+.PHONY : doorway_detection_node
+
+# fast build rule for target.
+doorway_detection_node/fast:
+	$(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/build
+.PHONY : doorway_detection_node/fast
+
+#=============================================================================
 # Target rules for targets named tf2_msgs_generate_messages_nodejs
 
 # Build rule for target.
@@ -1348,6 +1361,7 @@ help:
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... std_msgs_generate_messages_py"
+	@echo "... doorway_detection_node"
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... tf2_msgs_generate_messages_py"
 	@echo "... tf2_msgs_generate_messages_lisp"

@@ -264,7 +264,7 @@ gtest/googlemock/preinstall: gtest/googlemock/gtest/preinstall
 gtest/googlemock/CMakeFiles/gmock_main.dir/all:
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/depend
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=4,5,6,7 "Built target gmock_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=6,7,8,9 "Built target gmock_main"
 .PHONY : gtest/googlemock/CMakeFiles/gmock_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -296,7 +296,7 @@ clean: gtest/googlemock/CMakeFiles/gmock_main.dir/clean
 gtest/googlemock/CMakeFiles/gmock.dir/all:
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/depend
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=1,2,3 "Built target gmock"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=3,4,5 "Built target gmock"
 .PHONY : gtest/googlemock/CMakeFiles/gmock.dir/all
 
 # Build rule for subdir invocation for target.
@@ -347,7 +347,7 @@ gtest/googlemock/gtest/preinstall:
 gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/all: gtest/googlemock/gtest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/depend
 	$(MAKE) -f gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=10,11 "Built target gtest_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=12,13 "Built target gtest_main"
 .PHONY : gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -379,7 +379,7 @@ clean: gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/clean
 gtest/googlemock/gtest/CMakeFiles/gtest.dir/all:
 	$(MAKE) -f gtest/googlemock/gtest/CMakeFiles/gtest.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest.dir/depend
 	$(MAKE) -f gtest/googlemock/gtest/CMakeFiles/gtest.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=8,9 "Built target gtest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=10,11 "Built target gtest"
 .PHONY : gtest/googlemock/gtest/CMakeFiles/gtest.dir/all
 
 # Build rule for subdir invocation for target.
@@ -920,11 +920,13 @@ clean: my_rgbd_gazebo/CMakeFiles/std_msgs_generate_messages_py.dir/clean
 # Directory level rules for directory my_image_processor
 
 # Convenience name for "all" pass in the directory.
+my_image_processor/all: my_image_processor/CMakeFiles/doorway_detection_node.dir/all
 my_image_processor/all: my_image_processor/CMakeFiles/noise_node.dir/all
 
 .PHONY : my_image_processor/all
 
 # Convenience name for "clean" pass in the directory.
+my_image_processor/clean: my_image_processor/CMakeFiles/doorway_detection_node.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/tf2_msgs_generate_messages_py.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/clean
@@ -996,6 +998,43 @@ my_image_processor/clean: my_image_processor/CMakeFiles/std_srvs_generate_messag
 my_image_processor/preinstall:
 
 .PHONY : my_image_processor/preinstall
+
+#=============================================================================
+# Target rules for target my_image_processor/CMakeFiles/doorway_detection_node.dir
+
+# All Build rule for target.
+my_image_processor/CMakeFiles/doorway_detection_node.dir/all:
+	$(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/depend
+	$(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=1,2 "Built target doorway_detection_node"
+.PHONY : my_image_processor/CMakeFiles/doorway_detection_node.dir/all
+
+# Include target in all.
+all: my_image_processor/CMakeFiles/doorway_detection_node.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+my_image_processor/CMakeFiles/doorway_detection_node.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/doorway_detection_node.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles 0
+.PHONY : my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
+
+# Convenience name for target.
+doorway_detection_node: my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
+
+.PHONY : doorway_detection_node
+
+# clean rule for target.
+my_image_processor/CMakeFiles/doorway_detection_node.dir/clean:
+	$(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/clean
+.PHONY : my_image_processor/CMakeFiles/doorway_detection_node.dir/clean
+
+# clean rule for target.
+clean: my_image_processor/CMakeFiles/doorway_detection_node.dir/clean
+
+.PHONY : clean
 
 #=============================================================================
 # Target rules for target my_image_processor/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir
@@ -1644,7 +1683,7 @@ clean: my_image_processor/CMakeFiles/sensor_msgs_generate_messages_eus.dir/clean
 my_image_processor/CMakeFiles/noise_node.dir/all:
 	$(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/depend
 	$(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=12,13 "Built target noise_node"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=14,15 "Built target noise_node"
 .PHONY : my_image_processor/CMakeFiles/noise_node.dir/all
 
 # Include target in all.

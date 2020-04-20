@@ -168,6 +168,21 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+my_image_processor/CMakeFiles/doorway_detection_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
+
+# Convenience name for target.
+doorway_detection_node: my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
+
+.PHONY : doorway_detection_node
+
+# fast build rule for target.
+doorway_detection_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/build
+.PHONY : doorway_detection_node/fast
+
+# Convenience name for target.
 my_image_processor/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
 .PHONY : my_image_processor/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
@@ -1127,6 +1142,33 @@ std_srvs_generate_messages_cpp/fast:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make my_image_processor/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
 .PHONY : std_srvs_generate_messages_cpp/fast
 
+src/doorway_detection_node.o: src/doorway_detection_node.cpp.o
+
+.PHONY : src/doorway_detection_node.o
+
+# target to build an object file
+src/doorway_detection_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_node.cpp.o
+.PHONY : src/doorway_detection_node.cpp.o
+
+src/doorway_detection_node.i: src/doorway_detection_node.cpp.i
+
+.PHONY : src/doorway_detection_node.i
+
+# target to preprocess a source file
+src/doorway_detection_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_node.cpp.i
+.PHONY : src/doorway_detection_node.cpp.i
+
+src/doorway_detection_node.s: src/doorway_detection_node.cpp.s
+
+.PHONY : src/doorway_detection_node.s
+
+# target to generate assembly for a file
+src/doorway_detection_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_node.cpp.s
+.PHONY : src/doorway_detection_node.cpp.s
+
 src/noise_node.o: src/noise_node.cpp.o
 
 .PHONY : src/noise_node.o
@@ -1163,6 +1205,7 @@ help:
 	@echo "... install"
 	@echo "... list_install_components"
 	@echo "... edit_cache"
+	@echo "... doorway_detection_node"
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... install/strip"
 	@echo "... tf2_msgs_generate_messages_py"
@@ -1231,6 +1274,9 @@ help:
 	@echo "... nodelet_topic_tools_gencfg"
 	@echo "... actionlib_msgs_generate_messages_cpp"
 	@echo "... std_srvs_generate_messages_cpp"
+	@echo "... src/doorway_detection_node.o"
+	@echo "... src/doorway_detection_node.i"
+	@echo "... src/doorway_detection_node.s"
 	@echo "... src/noise_node.o"
 	@echo "... src/noise_node.i"
 	@echo "... src/noise_node.s"

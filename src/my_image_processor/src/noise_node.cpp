@@ -18,13 +18,13 @@ float stddev = 0.1;
  * 
  * The nose callback add a Gaussian noise to the pointcloud raw data.
  */
-void noiseCallback(const sensor_msgs::PointCloud2 &cloud_msg)
+void noiseCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
 {
     pcl::PCLPointCloud2 pcl_pc2;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_ptr (new pcl::PointCloud<pcl::PointXYZ>);
 
     // Convert from ROS sensor_msg::POintCloud2 to pcl_pointcloud2
-    pcl_conversions::toPCL(cloud_msg, pcl_pc2);
+    pcl_conversions::toPCL(*cloud_msg, pcl_pc2);
     // Convert from pcl_pointCloud2 to pcl::pointCloud<pointXYZ>
     pcl::fromPCLPointCloud2(pcl_pc2, *cloud_ptr);
 
@@ -117,12 +117,12 @@ int main(int argc, char **argv)
 	 */
     ros::NodeHandle nh;
 
-/**
+	/**
   	 * The subscribe() call is how you tell ROS that you want to receive messages
   	 * on a given topic.  This invokes a call to the ROS
 	 * master node, which keeps a registry of who is publishing and who
 	 * is subscribing.  Messages are passed to a callback function, here
-	 * called chatterCallback.  subscribe() returns a Subscriber object that you
+	 * called noiseCallback.  subscribe() returns a Subscriber object that you
 	 * must hold on to until you want to unsubscribe.  When all copies of the Subscriber
 	 * object go out of scope, this callback will automatically be unsubscribed from
 	 * this topic.
