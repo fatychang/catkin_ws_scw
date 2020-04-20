@@ -3,7 +3,6 @@
 
 my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_node.cpp.o
  /media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/doorway_detection_node.cpp
- /opt/ros/melodic/include/cv_bridge/cv_bridge.h
  /opt/ros/melodic/include/pcl_conversions/pcl_conversions.h
  /opt/ros/melodic/include/pcl_msgs/ModelCoefficients.h
  /opt/ros/melodic/include/pcl_msgs/PointIndices.h
@@ -65,11 +64,9 @@ my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_n
  /opt/ros/melodic/include/ros/wall_timer.h
  /opt/ros/melodic/include/ros/wall_timer_options.h
  /opt/ros/melodic/include/rosconsole/macros_generated.h
- /opt/ros/melodic/include/sensor_msgs/CompressedImage.h
  /opt/ros/melodic/include/sensor_msgs/Image.h
  /opt/ros/melodic/include/sensor_msgs/PointCloud2.h
  /opt/ros/melodic/include/sensor_msgs/PointField.h
- /opt/ros/melodic/include/sensor_msgs/image_encodings.h
  /opt/ros/melodic/include/std_msgs/Header.h
  /opt/ros/melodic/include/xmlrpcpp/XmlRpcDecl.h
  /opt/ros/melodic/include/xmlrpcpp/XmlRpcValue.h
@@ -288,6 +285,20 @@ my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_n
  /usr/include/eigen3/Eigen/src/plugins/CommonCwiseUnaryOps.h
  /usr/include/eigen3/Eigen/src/plugins/MatrixCwiseBinaryOps.h
  /usr/include/eigen3/Eigen/src/plugins/MatrixCwiseUnaryOps.h
+ /usr/include/eigen3/unsupported/Eigen/NonLinearOptimization
+ /usr/include/eigen3/unsupported/Eigen/NumericalDiff
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/HybridNonLinearSolver.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/LevenbergMarquardt.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/chkder.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/covar.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/dogleg.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/fdjac1.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/lmpar.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/qrsolv.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/r1mpyq.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/r1updt.h
+ /usr/include/eigen3/unsupported/Eigen/src/NonLinearOptimization/rwupdt.h
+ /usr/include/eigen3/unsupported/Eigen/src/NumericalDiff/NumericalDiff.h
  /usr/include/pcl-1.8/pcl/ModelCoefficients.h
  /usr/include/pcl-1.8/pcl/PCLHeader.h
  /usr/include/pcl-1.8/pcl/PCLImage.h
@@ -297,16 +308,38 @@ my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_n
  /usr/include/pcl-1.8/pcl/PolygonMesh.h
  /usr/include/pcl-1.8/pcl/TextureMesh.h
  /usr/include/pcl-1.8/pcl/Vertices.h
+ /usr/include/pcl-1.8/pcl/cloud_iterator.h
+ /usr/include/pcl-1.8/pcl/common/centroid.h
+ /usr/include/pcl-1.8/pcl/common/common.h
  /usr/include/pcl-1.8/pcl/common/concatenate.h
  /usr/include/pcl-1.8/pcl/common/copy_point.h
+ /usr/include/pcl-1.8/pcl/common/distances.h
+ /usr/include/pcl-1.8/pcl/common/eigen.h
+ /usr/include/pcl-1.8/pcl/common/impl/accumulators.hpp
+ /usr/include/pcl-1.8/pcl/common/impl/centroid.hpp
+ /usr/include/pcl-1.8/pcl/common/impl/common.hpp
  /usr/include/pcl-1.8/pcl/common/impl/copy_point.hpp
+ /usr/include/pcl-1.8/pcl/common/impl/eigen.hpp
  /usr/include/pcl-1.8/pcl/common/impl/io.hpp
  /usr/include/pcl-1.8/pcl/common/io.h
  /usr/include/pcl-1.8/pcl/common/point_tests.h
  /usr/include/pcl-1.8/pcl/console/print.h
  /usr/include/pcl-1.8/pcl/conversions.h
+ /usr/include/pcl-1.8/pcl/correspondence.h
  /usr/include/pcl-1.8/pcl/exceptions.h
+ /usr/include/pcl-1.8/pcl/filters/boost.h
+ /usr/include/pcl-1.8/pcl/filters/extract_indices.h
+ /usr/include/pcl-1.8/pcl/filters/filter.h
+ /usr/include/pcl-1.8/pcl/filters/filter_indices.h
+ /usr/include/pcl-1.8/pcl/filters/impl/extract_indices.hpp
+ /usr/include/pcl-1.8/pcl/filters/impl/filter.hpp
+ /usr/include/pcl-1.8/pcl/filters/impl/filter_indices.hpp
+ /usr/include/pcl-1.8/pcl/filters/impl/project_inliers.hpp
+ /usr/include/pcl-1.8/pcl/filters/impl/voxel_grid.hpp
+ /usr/include/pcl-1.8/pcl/filters/project_inliers.h
+ /usr/include/pcl-1.8/pcl/filters/voxel_grid.h
  /usr/include/pcl-1.8/pcl/for_each_type.h
+ /usr/include/pcl-1.8/pcl/impl/cloud_iterator.hpp
  /usr/include/pcl-1.8/pcl/impl/pcl_base.hpp
  /usr/include/pcl-1.8/pcl/impl/point_types.hpp
  /usr/include/pcl-1.8/pcl/io/boost.h
@@ -322,6 +355,58 @@ my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_n
  /usr/include/pcl-1.8/pcl/point_traits.h
  /usr/include/pcl-1.8/pcl/point_types.h
  /usr/include/pcl-1.8/pcl/register_point_struct.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/boost.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/eigen.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/lmeds.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/mlesac.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/msac.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/prosac.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/ransac.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/rmsac.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/rransac.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_circle.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_circle3d.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_cone.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_cylinder.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_line.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_normal_parallel_plane.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_normal_plane.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_normal_sphere.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_parallel_line.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_parallel_plane.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_perpendicular_plane.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_plane.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_sphere.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/impl/sac_model_stick.hpp
+ /usr/include/pcl-1.8/pcl/sample_consensus/lmeds.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/method_types.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/mlesac.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/model_types.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/msac.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/prosac.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/ransac.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/rmsac.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/rransac.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_circle.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_circle3d.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_cone.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_cylinder.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_line.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_normal_parallel_plane.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_normal_plane.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_normal_sphere.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_parallel_line.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_parallel_plane.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_perpendicular_plane.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_plane.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_sphere.h
+ /usr/include/pcl-1.8/pcl/sample_consensus/sac_model_stick.h
+ /usr/include/pcl-1.8/pcl/search/impl/search.hpp
+ /usr/include/pcl-1.8/pcl/search/search.h
+ /usr/include/pcl-1.8/pcl/segmentation/impl/sac_segmentation.hpp
+ /usr/include/pcl-1.8/pcl/segmentation/sac_segmentation.h
  /usr/include/x86_64-linux-gnu/bits/mman-linux.h
  /usr/include/x86_64-linux-gnu/bits/mman-shared.h
  /usr/include/x86_64-linux-gnu/bits/mman.h

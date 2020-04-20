@@ -3,7 +3,6 @@
 #include "sensor_msgs/PointCloud2.h"
 
 #include "pcl_conversions/pcl_conversions.h"
-#include "cv_bridge/cv_bridge.h"
 
 #include <Eigen/Dense>
 #include <random>
