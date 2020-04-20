@@ -131,6 +131,8 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/gtest/cmake_install.cmake")
+  include("/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_rgbd_gazebo/cmake_install.cmake")
+  include("/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/cmake_install.cmake")
 
 endif()
 

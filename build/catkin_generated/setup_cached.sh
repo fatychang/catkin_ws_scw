@@ -7,7 +7,4 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/media/js/data/WFH/Ubuntu/catkin_ws_scw/devel:$CMAKE_PREFIX_PATH"
 export PWD="/media/js/data/WFH/Ubuntu/catkin_ws_scw/build"
-export ROSLISP_PACKAGE_DIRECTORIES="/media/js/data/WFH/Ubuntu/catkin_ws_scw/devel/share/common-lisp"
-export ROS_PACKAGE_PATH="/media/js/data/WFH/Ubuntu/catkin_ws_scw/src:$ROS_PACKAGE_PATH"

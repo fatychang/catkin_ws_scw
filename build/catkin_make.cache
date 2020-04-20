@@ -1,2 +1,2 @@
-
+my_image_processor:my_rgbd_gazebo
 -DCATKIN_DEVEL_PREFIX=/media/js/data/WFH/Ubuntu/catkin_ws_scw/devel -DCMAKE_INSTALL_PREFIX=/media/js/data/WFH/Ubuntu/catkin_ws_scw/install -G Unix Makefiles

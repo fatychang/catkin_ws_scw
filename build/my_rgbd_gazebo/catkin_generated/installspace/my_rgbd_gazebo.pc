@@ -1,0 +1,8 @@
+prefix=/media/js/data/WFH/Ubuntu/catkin_ws_scw/install
+
+Name: my_rgbd_gazebo
+Description: Description of my_rgbd_gazebo
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
