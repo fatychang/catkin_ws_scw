@@ -2,4 +2,4 @@
 source_root_dir = '/media/js/data/WFH/Ubuntu/catkin_ws_scw/src'
 whitelisted_packages = ''.split(';') if '' != '' else []
 blacklisted_packages = ''.split(';') if '' != '' else []
-underlay_workspaces = '/media/js/data/WFH/Ubuntu/catkin_ws_scw/devel;/opt/ros/melodic'.split(';') if '/media/js/data/WFH/Ubuntu/catkin_ws_scw/devel;/opt/ros/melodic' != '' else []
+underlay_workspaces = '/opt/ros/melodic'.split(';') if '/opt/ros/melodic' != '' else []

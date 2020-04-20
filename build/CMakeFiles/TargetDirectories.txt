@@ -83,6 +83,7 @@
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/actionlib_generate_messages_cpp.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/sensor_msgs_generate_messages_nodejs.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/sensor_msgs_generate_messages_eus.dir
+/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/noise_node.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/sensor_msgs_generate_messages_cpp.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/actionlib_msgs_generate_messages_eus.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/nodelet_generate_messages_lisp.dir

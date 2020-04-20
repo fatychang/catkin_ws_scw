@@ -468,6 +468,21 @@ sensor_msgs_generate_messages_eus/fast:
 .PHONY : sensor_msgs_generate_messages_eus/fast
 
 # Convenience name for target.
+my_image_processor/CMakeFiles/noise_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/noise_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/noise_node.dir/rule
+
+# Convenience name for target.
+noise_node: my_image_processor/CMakeFiles/noise_node.dir/rule
+
+.PHONY : noise_node
+
+# fast build rule for target.
+noise_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/build
+.PHONY : noise_node/fast
+
+# Convenience name for target.
 my_image_processor/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
 .PHONY : my_image_processor/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
@@ -1112,6 +1127,33 @@ std_srvs_generate_messages_cpp/fast:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make my_image_processor/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
 .PHONY : std_srvs_generate_messages_cpp/fast
 
+src/noise_node.o: src/noise_node.cpp.o
+
+.PHONY : src/noise_node.o
+
+# target to build an object file
+src/noise_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/src/noise_node.cpp.o
+.PHONY : src/noise_node.cpp.o
+
+src/noise_node.i: src/noise_node.cpp.i
+
+.PHONY : src/noise_node.i
+
+# target to preprocess a source file
+src/noise_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/src/noise_node.cpp.i
+.PHONY : src/noise_node.cpp.i
+
+src/noise_node.s: src/noise_node.cpp.s
+
+.PHONY : src/noise_node.s
+
+# target to generate assembly for a file
+src/noise_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/src/noise_node.cpp.s
+.PHONY : src/noise_node.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -1144,6 +1186,7 @@ help:
 	@echo "... actionlib_generate_messages_cpp"
 	@echo "... sensor_msgs_generate_messages_nodejs"
 	@echo "... sensor_msgs_generate_messages_eus"
+	@echo "... noise_node"
 	@echo "... sensor_msgs_generate_messages_cpp"
 	@echo "... actionlib_msgs_generate_messages_eus"
 	@echo "... nodelet_generate_messages_lisp"
@@ -1188,6 +1231,9 @@ help:
 	@echo "... nodelet_topic_tools_gencfg"
 	@echo "... actionlib_msgs_generate_messages_cpp"
 	@echo "... std_srvs_generate_messages_cpp"
+	@echo "... src/noise_node.o"
+	@echo "... src/noise_node.i"
+	@echo "... src/noise_node.s"
 .PHONY : help
 
 

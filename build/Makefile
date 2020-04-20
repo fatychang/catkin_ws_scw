@@ -740,6 +740,19 @@ sensor_msgs_generate_messages_eus/fast:
 .PHONY : sensor_msgs_generate_messages_eus/fast
 
 #=============================================================================
+# Target rules for targets named noise_node
+
+# Build rule for target.
+noise_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 noise_node
+.PHONY : noise_node
+
+# fast build rule for target.
+noise_node/fast:
+	$(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/build
+.PHONY : noise_node/fast
+
+#=============================================================================
 # Target rules for targets named sensor_msgs_generate_messages_cpp
 
 # Build rule for target.
@@ -1355,6 +1368,7 @@ help:
 	@echo "... actionlib_generate_messages_cpp"
 	@echo "... sensor_msgs_generate_messages_nodejs"
 	@echo "... sensor_msgs_generate_messages_eus"
+	@echo "... noise_node"
 	@echo "... sensor_msgs_generate_messages_cpp"
 	@echo "... actionlib_msgs_generate_messages_eus"
 	@echo "... nodelet_generate_messages_lisp"
