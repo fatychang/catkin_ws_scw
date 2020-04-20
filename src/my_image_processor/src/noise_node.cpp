@@ -10,6 +10,8 @@
 
 
 ros::Publisher pub;
+float mean = 0.0;
+float stddev = 0.1;
 
 
 /** @brief callback for the noise node.
@@ -27,8 +29,6 @@ void noiseCallback(const sensor_msgs::PointCloud2 &cloud_msg)
     pcl::fromPCLPointCloud2(pcl_pc2, *cloud_ptr);
 
     // Define random generator with Gaussian distribution
-    const float mean = 0.0;
-    const float stddev = 0.1;
     std::default_random_engine generator;
     std::normal_distribution<float> dist(mean, stddev);
     
@@ -52,9 +52,18 @@ void noiseCallback(const sensor_msgs::PointCloud2 &cloud_msg)
 
     // Publish the processed data
     pub.publish(output);
+}
 
-
-
+/** @brief Shows all the parse message usage.
+ * 
+ */
+static void showUsage(std::string name)
+{
+	std::cerr << "Usage: " << name << "option(s) SOURCES"
+			<< "Options:\n"
+			<< "\t -h, --help \t\t Show this help message\n"
+			<< "\t -m, --mean \t\t Mean of the Gaussian noise\n"
+			<< "\t -s, --std \t\t stddev of the Gaussian noise\n" <<std::endl;
 }
 
 
@@ -65,8 +74,30 @@ void noiseCallback(const sensor_msgs::PointCloud2 &cloud_msg)
  * ,add the noise to the raw data and publish the depth_noise topic to the ROS master.
  * 
  */
-int main(int argc, char* argv[])
+int main(int argc, char **argv)
 {
+	// Parse the commend line
+	for (int i=0; i<argc; ++i)
+	{
+		std::string arg = argv[i];
+
+		if ((arg == "-h") || (arg == "--help"))
+		{
+			showUsage(argv[0]);
+			return 0;
+		}
+		else if((arg == "-m") || (arg == "-mean"))
+		{
+			mean = std::stof(argv[i+1]);
+		}
+		else if((arg == "-s") || (arg == "-std"))
+		{
+			stddev = std::stof(argv[i+1]);
+		}
+	}
+	// ROS_INFO("[DEBUG] mean:%f, std:%f", mean, stddev);
+
+
     /**
 	 * The ros::init() function needs to see argc and argv so that it can perform
 	 * any ROS arguments and name remapping that were provided at the command line.
