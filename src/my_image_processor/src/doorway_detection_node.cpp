@@ -8,13 +8,16 @@
 #include "pcl/segmentation/sac_segmentation.h"
 #include "pcl/filters/extract_indices.h"
 #include "pcl/filters/project_inliers.h"
+#include "pcl/kdtree/kdtree_flann.h"
+#include "pcl/common/geometry.h"
 
-
+#include "visualization_msgs/Marker.h"
+#include "std_msgs/Float32MultiArray.h"
 
 #include <Eigen/Dense>
 #include <cmath>
 
-ros::Publisher pub;
+ros::Publisher pub1, pub2;
 
 // Parameters for image processing
 float leave_size = 0.05;
@@ -29,6 +32,9 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
     pcl::PointCloud<pcl::PointXYZ>::Ptr origin_cloud (new pcl::PointCloud<pcl::PointXYZ>),
                                         filtered_cloud (new pcl::PointCloud<pcl::PointXYZ>),
                                         door_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+
+    std_msgs::Float32MultiArray gapPtsMsg;
+
 
     // Convert from ROS message to pcl::pointcloud2
     pcl_conversions::toPCL(*cloud_msg, pcl_pc2);
@@ -65,27 +71,118 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
     }
     else
     {
+        ROS_INFO("[DEBUG]: The number of inliers:%d", inliers->indices.size() );
+
         // extract the inliers (keep the inliers)
         extract.setInputCloud(filtered_cloud);
         extract.setIndices(inliers);
         extract.setNegative(false);
-        extract.filter(*filtered_cloud);
+        extract.filter(*door_cloud);
+
+        // remove the outliers with statistical outlier removal filter
+
+
 
         // project the inliers onto the plane
         pcl::ProjectInliers<pcl::PointXYZ> proj;
         proj.setModelType(pcl::SACMODEL_PLANE);
-        proj.setInputCloud(filtered_cloud);
+        proj.setInputCloud(door_cloud);
         proj.setModelCoefficients(coefficients);
-        proj.filter(*filtered_cloud);
+        proj.filter(*door_cloud);
 
-        int numOfPoints = filtered_cloud->points.size();
+        int numOfPoints = door_cloud->points.size();
 
 
-        // Convert to ROS message data type
-        sensor_msgs::PointCloud2 output;
-        pcl::toROSMsg(*filtered_cloud.get(), output);
-        pub.publish(output);
+        //  Stripe Scan //
+        // find the minimal x and maxmum x to mark the start and end of the stripe scan
+        float min_x = door_cloud -> points[0].x, max_x = door_cloud -> points[0].x;
+        int min_x_id = 0, max_x_id = 0;
+        for (int i=1; i<numOfPoints; ++i)
+		{
+			if(door_cloud->points[i].x < min_x)
+			{
+				min_x = door_cloud->points[i].x;
+				min_x_id = i;
+			}
+			if(door_cloud->points[i].x > max_x)
+			{
+				max_x = door_cloud->points[i].x;
+				max_x_id = i;
+			}
+		}
+		// ROS_INFO("[DEBU]: min_x:%f at %d",min_x, min_x_id);
+		// ROS_INFO("[DEBU]: max_x:%f at %d",max_x, max_x_id);
+
+        //  Find door   //
+        // k-d tree neighboring search
+        pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+        kdtree.setInputCloud(door_cloud);
+        float search_radius = 0.05;
+        float terminate_threshold = 0.01;
+        float step_size = 0.05;
+
+        pcl::PointXYZ searchPoint, endPoint, searchPointPrev;
+        int numOfNeighbors = 1, numOfNeighborsPrev = 1;
+        searchPoint = door_cloud->points[min_x_id];
+        endPoint = door_cloud->points[max_x_id];
+
+        float door_width_min = 0.82;     //[m] follows American's with Disabilities Act (ADA)
+        float door_width_max = 1.64;     //[m]
+
+        pcl::PointXYZ gapStart, gapEnd;
+        gapPtsMsg.data.clear();
+        
+        // search for the gap
+       while (endPoint.x - searchPoint.x > terminate_threshold)
+       {
+            std::vector<int> pointId;       //stores the id of the poins that are within the radius
+            std::vector<float> pointDist;   //stores the squre distance of the points that are within the raduis
+
+            numOfNeighborsPrev = numOfNeighbors;
+            numOfNeighbors = kdtree.radiusSearch(searchPoint, search_radius, pointId, pointDist);
+
+            // ROS_INFO("[DEBUG] numOfNeighbors:%d", numOfNeighbors);
+            // break;
+
+            // check whether a door is found
+            if(numOfNeighbors == 0 && numOfNeighborsPrev != 0)
+            {
+                // get the gap start position
+                gapStart = searchPoint;
+                // ROS_INFO("gap_start_pt: (%f, %f, %f)",gapStart.x, gapStart.y, gapStart.z);
+            }
+            else if(numOfNeighbors !=0 && numOfNeighborsPrev == 0)
+            {
+                // get the gap end position
+                gapEnd = searchPoint;
+                // ROS_INFO("gap_end_pt: (%f, %f, %f)",gapEnd.x, gapEnd.y, gapEnd.z);
+
+                gapPtsMsg.data.push_back(gapStart.x), gapPtsMsg.data.push_back(gapStart.y),gapPtsMsg.data.push_back(gapStart.z);
+                gapPtsMsg.data.push_back(gapEnd.x), gapPtsMsg.data.push_back(gapEnd.y),gapPtsMsg.data.push_back(gapEnd.z);
+
+
+                // calculate the width of the gap whether within the door rang
+                float gapWidth = pcl::geometry::distance(gapEnd, gapStart);
+                ROS_INFO("[DEBUG] gap width:%f", gapWidth);
+                
+                break;
+            }
+
+            // update the previous point and the next search point
+            searchPointPrev = searchPoint;
+            searchPoint.x += step_size * coefficients->values[2];
+            searchPoint.z -= step_size * coefficients->values[0];
+       }
+
+
+
     }
+
+    // Convert to ROS message data type
+    sensor_msgs::PointCloud2 output;
+    pcl::toROSMsg(*door_cloud.get(), output);
+    pub1.publish(output);
+    pub2.publish(gapPtsMsg);
     
 
 
@@ -108,7 +205,7 @@ static void showUsage(std::string name)
 	std::cerr << "Usage: " << name << "option(s) SOURCES"
 			<< "Options:\n"
 			<< "\t -h, --help \t\t Show this help message\n"
-			<< "\t -l, --leave \t\t Leave size of the VoxelGrid filter (Default is 0.05)\n"
+			<< "\t -l, --leave \t\t Leave size of the VoxelGrid filter (Default is 0.08)\n"
 			<< "\t -a, --angle \t\t eps angle for the plane detection (Default is 30 degs.)\n" <<std::endl;
 }
 
@@ -153,7 +250,7 @@ int main(int argc, char **argv)
 	 * part of the ROS system.
 	 */
     ros::init(argc, argv, "doorway_detection_node");
-    ROS_INFO("[DEBUG] noise_node is now running...");
+    ROS_INFO("[DEBUG] doorway_detection_node is now running...");
 
     /**
 	 * NodeHandle is the main access point to communications with the ROS system.
@@ -178,6 +275,7 @@ int main(int argc, char **argv)
 	 * away the oldest ones.
 	 */
     ros::Subscriber sub = nh.subscribe("depth_noise", 1, doorwayCallback);
+    // ros::Subscriber sub = nh.subscribe("/camera/depth/points", 1, doorwayCallback);
 
 	 /**
 	  * The advertise() function is how you tell ROS that you want to
@@ -196,7 +294,8 @@ int main(int argc, char **argv)
 	  * than we can send them, the number here specifies how many messages to
 	  * buffer up before throwing some away.
 	  */
-    pub = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
+    pub1 = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
+    pub2 = nh.advertise<std_msgs::Float32MultiArray>("gapPnts",1);
 
     ros::spin();
 
