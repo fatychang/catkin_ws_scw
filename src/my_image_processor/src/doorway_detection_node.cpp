@@ -7,6 +7,7 @@
 #include "pcl/filters/voxel_grid.h"
 #include "pcl/segmentation/sac_segmentation.h"
 #include "pcl/filters/extract_indices.h"
+#include <pcl/filters/statistical_outlier_removal.h>
 #include "pcl/filters/project_inliers.h"
 #include "pcl/kdtree/kdtree_flann.h"
 #include "pcl/common/geometry.h"
@@ -21,6 +22,7 @@ ros::Publisher pub1, pub2;
 
 // Parameters for image processing
 float leave_size = 0.05;
+int meanK = 50;
 float epsAngle = 30.0f;
 
 /** @brief The callback process the raw depth information to find the possible doorway position.
@@ -71,7 +73,7 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
     }
     else
     {
-        ROS_INFO("[DEBUG]: The number of inliers:%d", inliers->indices.size() );
+        // ROS_INFO("[DEBUG]: The number of inliers:%d", inliers->indices.size() );
 
         // extract the inliers (keep the inliers)
         extract.setInputCloud(filtered_cloud);
@@ -80,7 +82,11 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
         extract.filter(*door_cloud);
 
         // remove the outliers with statistical outlier removal filter
-
+        pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+        sor.setInputCloud(door_cloud);
+        sor.setMeanK(meanK);
+        sor.setStddevMulThresh(1.0);
+        sor.filter(*door_cloud);
 
 
         // project the inliers onto the plane
@@ -91,6 +97,8 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
         proj.filter(*door_cloud);
 
         int numOfPoints = door_cloud->points.size();
+        ROS_INFO("[DEBUG]: The number of inliers:%d", numOfPoints);
+
 
 
         //  Stripe Scan //
@@ -163,7 +171,7 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
 
                 // calculate the width of the gap whether within the door rang
                 float gapWidth = pcl::geometry::distance(gapEnd, gapStart);
-                ROS_INFO("[DEBUG] gap width:%f", gapWidth);
+                // ROS_INFO("[DEBUG] gap width:%f", gapWidth);
                 
                 break;
             }
@@ -206,7 +214,8 @@ static void showUsage(std::string name)
 			<< "Options:\n"
 			<< "\t -h, --help \t\t Show this help message\n"
 			<< "\t -l, --leave \t\t Leave size of the VoxelGrid filter (Default is 0.08)\n"
-			<< "\t -a, --angle \t\t eps angle for the plane detection (Default is 30 degs.)\n" <<std::endl;
+			<< "\t -a, --angle \t\t eps angle for the plane detection (Default is 30 degs.)\n" 
+            << "\t -k, --meanK \t\t meanK for the statistical outlier removal (Default is 50)"<<std::endl;
 }
 
 
@@ -237,6 +246,10 @@ int main(int argc, char **argv)
 		else if((arg == "-a") || (arg == "-angle"))
 		{
 			epsAngle = std::stof(argv[i+1]);
+		}
+        else if((arg == "-k") || (arg == "-meanK"))
+		{
+			meanK = std::stof(argv[i+1]);
 		}
 	}
 
