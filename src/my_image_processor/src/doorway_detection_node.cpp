@@ -295,7 +295,7 @@ int main(int argc, char **argv)
 	  * buffer up before throwing some away.
 	  */
     pub1 = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
-    pub2 = nh.advertise<std_msgs::Float32MultiArray>("gapPnts",1);
+    pub2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo",1);
 
     ros::spin();
 

@@ -844,6 +844,19 @@ pcl_msgs_generate_messages_py/fast:
 .PHONY : pcl_msgs_generate_messages_py/fast
 
 #=============================================================================
+# Target rules for targets named points_visualizer_node
+
+# Build rule for target.
+points_visualizer_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 points_visualizer_node
+.PHONY : points_visualizer_node
+
+# fast build rule for target.
+points_visualizer_node/fast:
+	$(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/build
+.PHONY : points_visualizer_node/fast
+
+#=============================================================================
 # Target rules for targets named geometry_msgs_generate_messages_cpp
 
 # Build rule for target.
@@ -1389,6 +1402,7 @@ help:
 	@echo "... pcl_msgs_generate_messages_eus"
 	@echo "... geometry_msgs_generate_messages_eus"
 	@echo "... pcl_msgs_generate_messages_py"
+	@echo "... points_visualizer_node"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... geometry_msgs_generate_messages_lisp"
 	@echo "... sensor_msgs_generate_messages_lisp"

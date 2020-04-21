@@ -588,6 +588,21 @@ pcl_msgs_generate_messages_py/fast:
 .PHONY : pcl_msgs_generate_messages_py/fast
 
 # Convenience name for target.
+my_image_processor/CMakeFiles/points_visualizer_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/points_visualizer_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/points_visualizer_node.dir/rule
+
+# Convenience name for target.
+points_visualizer_node: my_image_processor/CMakeFiles/points_visualizer_node.dir/rule
+
+.PHONY : points_visualizer_node
+
+# fast build rule for target.
+points_visualizer_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/build
+.PHONY : points_visualizer_node/fast
+
+# Convenience name for target.
 my_image_processor/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
 .PHONY : my_image_processor/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
@@ -1196,6 +1211,33 @@ src/noise_node.cpp.s:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/src/noise_node.cpp.s
 .PHONY : src/noise_node.cpp.s
 
+src/points_visualizer_node.o: src/points_visualizer_node.cpp.o
+
+.PHONY : src/points_visualizer_node.o
+
+# target to build an object file
+src/points_visualizer_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/src/points_visualizer_node.cpp.o
+.PHONY : src/points_visualizer_node.cpp.o
+
+src/points_visualizer_node.i: src/points_visualizer_node.cpp.i
+
+.PHONY : src/points_visualizer_node.i
+
+# target to preprocess a source file
+src/points_visualizer_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/src/points_visualizer_node.cpp.i
+.PHONY : src/points_visualizer_node.cpp.i
+
+src/points_visualizer_node.s: src/points_visualizer_node.cpp.s
+
+.PHONY : src/points_visualizer_node.s
+
+# target to generate assembly for a file
+src/points_visualizer_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/src/points_visualizer_node.cpp.s
+.PHONY : src/points_visualizer_node.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -1236,6 +1278,7 @@ help:
 	@echo "... pcl_msgs_generate_messages_eus"
 	@echo "... geometry_msgs_generate_messages_eus"
 	@echo "... pcl_msgs_generate_messages_py"
+	@echo "... points_visualizer_node"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... geometry_msgs_generate_messages_lisp"
 	@echo "... install/local"
@@ -1280,6 +1323,9 @@ help:
 	@echo "... src/noise_node.o"
 	@echo "... src/noise_node.i"
 	@echo "... src/noise_node.s"
+	@echo "... src/points_visualizer_node.o"
+	@echo "... src/points_visualizer_node.i"
+	@echo "... src/points_visualizer_node.s"
 .PHONY : help
 
 

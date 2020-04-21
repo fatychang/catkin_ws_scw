@@ -922,6 +922,7 @@ clean: my_rgbd_gazebo/CMakeFiles/std_msgs_generate_messages_py.dir/clean
 # Convenience name for "all" pass in the directory.
 my_image_processor/all: my_image_processor/CMakeFiles/doorway_detection_node.dir/all
 my_image_processor/all: my_image_processor/CMakeFiles/noise_node.dir/all
+my_image_processor/all: my_image_processor/CMakeFiles/points_visualizer_node.dir/all
 
 .PHONY : my_image_processor/all
 
@@ -954,6 +955,7 @@ my_image_processor/clean: my_image_processor/CMakeFiles/nodelet_generate_message
 my_image_processor/clean: my_image_processor/CMakeFiles/pcl_msgs_generate_messages_eus.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/geometry_msgs_generate_messages_eus.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/pcl_msgs_generate_messages_py.dir/clean
+my_image_processor/clean: my_image_processor/CMakeFiles/points_visualizer_node.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/clean
 my_image_processor/clean: my_image_processor/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/clean
@@ -1902,6 +1904,43 @@ my_image_processor/CMakeFiles/pcl_msgs_generate_messages_py.dir/clean:
 
 # clean rule for target.
 clean: my_image_processor/CMakeFiles/pcl_msgs_generate_messages_py.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target my_image_processor/CMakeFiles/points_visualizer_node.dir
+
+# All Build rule for target.
+my_image_processor/CMakeFiles/points_visualizer_node.dir/all:
+	$(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/depend
+	$(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles --progress-num=16,17 "Built target points_visualizer_node"
+.PHONY : my_image_processor/CMakeFiles/points_visualizer_node.dir/all
+
+# Include target in all.
+all: my_image_processor/CMakeFiles/points_visualizer_node.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+my_image_processor/CMakeFiles/points_visualizer_node.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/points_visualizer_node.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/CMakeFiles 0
+.PHONY : my_image_processor/CMakeFiles/points_visualizer_node.dir/rule
+
+# Convenience name for target.
+points_visualizer_node: my_image_processor/CMakeFiles/points_visualizer_node.dir/rule
+
+.PHONY : points_visualizer_node
+
+# clean rule for target.
+my_image_processor/CMakeFiles/points_visualizer_node.dir/clean:
+	$(MAKE) -f my_image_processor/CMakeFiles/points_visualizer_node.dir/build.make my_image_processor/CMakeFiles/points_visualizer_node.dir/clean
+.PHONY : my_image_processor/CMakeFiles/points_visualizer_node.dir/clean
+
+# clean rule for target.
+clean: my_image_processor/CMakeFiles/points_visualizer_node.dir/clean
 
 .PHONY : clean
 

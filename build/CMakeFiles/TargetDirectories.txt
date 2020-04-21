@@ -91,6 +91,7 @@
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/pcl_msgs_generate_messages_eus.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/geometry_msgs_generate_messages_eus.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/pcl_msgs_generate_messages_py.dir
+/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/points_visualizer_node.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/geometry_msgs_generate_messages_cpp.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/geometry_msgs_generate_messages_lisp.dir
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/install/local.dir
