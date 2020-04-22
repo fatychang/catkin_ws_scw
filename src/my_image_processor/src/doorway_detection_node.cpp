@@ -97,14 +97,16 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
         proj.filter(*door_cloud);
 
         int numOfPoints = door_cloud->points.size();
-        ROS_INFO("[DEBUG]: The number of inliers:%d", numOfPoints);
+    //     ROS_INFO("[DEBUG]: The number of inliers:%d", numOfPoints);
 
 
 
         //  Stripe Scan //
         // find the minimal x and maxmum x to mark the start and end of the stripe scan
+        // find the minimal y as well represents the floor
         float min_x = door_cloud -> points[0].x, max_x = door_cloud -> points[0].x;
-        int min_x_id = 0, max_x_id = 0;
+        float min_y = door_cloud -> points[0].y;
+        int min_x_id = 0, max_x_id = 0, min_y_id;
         for (int i=1; i<numOfPoints; ++i)
 		{
 			if(door_cloud->points[i].x < min_x)
@@ -117,6 +119,11 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
 				max_x = door_cloud->points[i].x;
 				max_x_id = i;
 			}
+            if(door_cloud->points[i].y < min_y)
+            {
+                min_y = door_cloud->points[i].y;
+                min_y_id = i;
+            }
 		}
 		// ROS_INFO("[DEBU]: min_x:%f at %d",min_x, min_x_id);
 		// ROS_INFO("[DEBU]: max_x:%f at %d",max_x, max_x_id);
@@ -157,7 +164,7 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
             {
                 // get the gap start position
                 gapStart = searchPoint;
-                // ROS_INFO("gap_start_pt: (%f, %f, %f)",gapStart.x, gapStart.y, gapStart.z);
+                ROS_INFO("gap_start_pt: (%f, %f, %f)",gapStart.x, gapStart.y, gapStart.z);
             }
             else if(numOfNeighbors !=0 && numOfNeighborsPrev == 0)
             {
@@ -165,8 +172,16 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
                 gapEnd = searchPoint;
                 // ROS_INFO("gap_end_pt: (%f, %f, %f)",gapEnd.x, gapEnd.y, gapEnd.z);
 
+                pcl::PointXYZ center;
+                center.x = (gapStart.x+gapEnd.x)/2;
+                center.y = min_y;
+                center.z = (gapStart.z+gapEnd.z)/2;
+                ROS_INFO("gap_end_pt: (%f, %f, %f)",center.x, center.y, center.z);
+
+
                 gapPtsMsg.data.push_back(gapStart.x), gapPtsMsg.data.push_back(gapStart.y),gapPtsMsg.data.push_back(gapStart.z);
-                gapPtsMsg.data.push_back(gapEnd.x), gapPtsMsg.data.push_back(gapEnd.y),gapPtsMsg.data.push_back(gapEnd.z);
+                //gapPtsMsg.data.push_back(gapEnd.x), gapPtsMsg.data.push_back(gapEnd.y),gapPtsMsg.data.push_back(gapEnd.z);
+                gapPtsMsg.data.push_back(center.x), gapPtsMsg.data.push_back(center.y),gapPtsMsg.data.push_back(center.z);
 
 
                 // calculate the width of the gap whether within the door rang

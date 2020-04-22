@@ -27,8 +27,8 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
     marker_pts2.id = 1;
     marker_pts1.type = marker_pts2.type = visualization_msgs::Marker::SPHERE;
 
-    marker_pts1.scale.x = marker_pts2.scale.x = 0.05;
-    marker_pts1.scale.y = marker_pts2.scale.y = 0.05;
+    marker_pts1.scale.x = marker_pts2.scale.x = 0.1;
+    marker_pts1.scale.y = marker_pts2.scale.y = 0.1;
     marker_pts1.color.a = marker_pts2.color.a =1.0;
 
     marker_pts1.color.r = 1.0f;
@@ -37,6 +37,7 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
 
     marker_pts1.pose.position.x = points[0], marker_pts1.pose.position.y = points[1], marker_pts1.pose.position.z = points[2];
     marker_pts2.pose.position.x = points[3], marker_pts2.pose.position.y = points[4], marker_pts2.pose.position.z = points[5];
+    //marker_pts2.pose.position.x = (points[0] + points[3])/2, marker_pts2.pose.position.y = (points[1]+ points[4])/2, marker_pts2.pose.position.z = (points[2]+points[5])/2;
 
     marker_pub1.publish(marker_pts1);
     marker_pub2.publish(marker_pts2);
