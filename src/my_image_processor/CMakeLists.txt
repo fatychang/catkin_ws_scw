@@ -144,6 +144,7 @@ include_directories(
 add_executable(noise_node src/noise_node.cpp)
 add_executable(doorway_detection_node src/doorway_detection_node.cpp)
 add_executable(points_visualizer_node src/points_visualizer_node.cpp)
+add_executable(docking_node src/docking_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -159,6 +160,7 @@ add_executable(points_visualizer_node src/points_visualizer_node.cpp)
 target_link_libraries(noise_node ${catkin_LIBRARIES})
 target_link_libraries(doorway_detection_node ${catkin_LIBRARIES})
 target_link_libraries(points_visualizer_node ${catkin_LIBRARIES})
+target_link_libraries(docking_node ${catkin_LIBRARIES})
 
 
 #############

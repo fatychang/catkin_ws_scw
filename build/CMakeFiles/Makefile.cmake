@@ -348,6 +348,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "my_image_processor/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/tf_generate_messages_py.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/sensor_msgs_generate_messages_py.dir/DependInfo.cmake"
+  "my_image_processor/CMakeFiles/docking_node.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/topic_tools_generate_messages_eus.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/pcl_msgs_generate_messages_lisp.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/geometry_msgs_generate_messages_py.dir/DependInfo.cmake"

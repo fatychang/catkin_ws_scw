@@ -6,6 +6,16 @@
 
 // image processing
 #include "pcl_conversions/pcl_conversions.h"
+#include "pcl/filters/voxel_grid.h"
+#include "pcl/filters/passthrough.h"
+
+// Declare publisher
+ros::Publisher pub;
+
+// Parameters for image processing
+float leaf_size = 0.1;
+int meanK = 50;
+float epsAngle = 30.0f;
 
 /** @brief The callback process the raw depth information to find the suitable docking location.
  * 
@@ -16,7 +26,57 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
     pcl::PointCloud<pcl::PointXYZ>::Ptr origin_cloud (new pcl::PointCloud<pcl::PointXYZ>),
                                         filtered_cloud (new pcl::PointCloud<pcl::PointXYZ>),
                                         table_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+    
+    // Convert the ROS message to the PCLPointCloud2
+    pcl_conversions::toPCL(*cloud_msg, pcl_pc2);
+    // Convert from the PCLPointCloud2 to pcl::PointXYZ
+    pcl::fromPCLPointCloud2(pcl_pc2, *origin_cloud);
 
+    // Downsample - VoxelGrid
+    pcl::VoxelGrid<pcl::PointXYZ> vox;
+    vox.setInputCloud(origin_cloud);
+    vox.setLeafSize(leaf_size, leaf_size, leaf_size);
+    vox.filter(*filtered_cloud);
+    std::cout << "[DEBUG]: the number of points:" << filtered_cloud->points.size() << std::endl;
+
+    // Remove the ground plane with pass through filter (can use transfer function to replace the min_y part)
+    float min_y = filtered_cloud -> points[0].y;
+    int min_y_id;
+    for (int i=1; i<filtered_cloud->points.size(); ++i)
+    {
+        if(filtered_cloud->points[i].y < min_y)
+        {
+            min_y = filtered_cloud->points[i].y;
+            min_y_id = i;
+        }
+    }
+    std::cout << "[DEBUG]: the minimum y:" << min_y << std::endl;
+
+    pcl::PassThrough<pcl::PointXYZ> pass;
+    pass.setInputCloud(filtered_cloud);
+    pass.setFilterFieldName("y");
+    pass.setFilterLimits((min_y + 0.3f), 5);      // higher than ground for 30cm
+    pass.filter(*filtered_cloud);
+    std::cout << "[DEBUG]: the number of points (pass):" << filtered_cloud->points.size() << std::endl;
+
+
+    // Convert to ROS message data type and publish
+    sensor_msgs::PointCloud2 output;
+    pcl::toROSMsg(*filtered_cloud.get(), output);
+    pub.publish(output);
+}
+
+/** @brief Shows all the parse message usage.
+ * 
+ */
+static void showUsage(std::string name)
+{
+	std::cerr << "Usage: " << name << "option(s) SOURCES"
+			<< "Options:\n"
+			<< "\t -h, --help \t\t Show this help message\n"
+			<< "\t -l, --leaf \t\t leaf_size size of the VoxelGrid filter (Default is 0.1)\n"
+			<< "\t -a, --angle \t\t eps angle for the plane detection (Default is 30 degs.)\n" 
+            << "\t -k, --meanK \t\t meanK for the statistical outlier removal (Default is 50)"<<std::endl;
 }
 
 /** @brief This node processes the depth input (ploint cloud) and to find the suitable docking location.
@@ -63,4 +123,27 @@ int main(int argc, char **argv)
 	 */
     ros::Subscriber sub = nh.subscribe("depth_noise", 1, dockingCallback);    
 
+
+	 /**
+	  * The advertise() function is how you tell ROS that you want to
+	  * publish on a given topic name. This invokes a call to the ROS
+	  * master node, which keeps a registry of who is publishing and who
+	  * is subscribing. After this advertise() call is made, the master
+	  * node will notify anyone who is trying to subscribe to this topic name,
+	  * and they will in turn negotiate a peer-to-peer connection with this
+	  * node.  advertise() returns a Publisher object which allows you to
+	  * publish messages on that topic through a call to publish().  Once
+	  * all copies of the returned Publisher object are destroyed, the topic
+	  * will be automatically unadvertised.
+	  *
+	  * The second parameter to advertise() is the size of the message queue
+	  * used for publishing messages.  If messages are published more quickly
+	  * than we can send them, the number here specifies how many messages to
+	  * buffer up before throwing some away.
+	  */
+     pub = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
+
+     ros::spin();
+
+     return 0;
 }

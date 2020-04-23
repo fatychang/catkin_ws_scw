@@ -708,6 +708,21 @@ sensor_msgs_generate_messages_py/fast:
 .PHONY : sensor_msgs_generate_messages_py/fast
 
 # Convenience name for target.
+my_image_processor/CMakeFiles/docking_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/docking_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/docking_node.dir/rule
+
+# Convenience name for target.
+docking_node: my_image_processor/CMakeFiles/docking_node.dir/rule
+
+.PHONY : docking_node
+
+# fast build rule for target.
+docking_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/docking_node.dir/build.make my_image_processor/CMakeFiles/docking_node.dir/build
+.PHONY : docking_node/fast
+
+# Convenience name for target.
 my_image_processor/CMakeFiles/topic_tools_generate_messages_eus.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/topic_tools_generate_messages_eus.dir/rule
 .PHONY : my_image_processor/CMakeFiles/topic_tools_generate_messages_eus.dir/rule
@@ -1157,6 +1172,33 @@ std_srvs_generate_messages_cpp/fast:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make my_image_processor/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
 .PHONY : std_srvs_generate_messages_cpp/fast
 
+src/docking_node.o: src/docking_node.cpp.o
+
+.PHONY : src/docking_node.o
+
+# target to build an object file
+src/docking_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/docking_node.dir/build.make my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o
+.PHONY : src/docking_node.cpp.o
+
+src/docking_node.i: src/docking_node.cpp.i
+
+.PHONY : src/docking_node.i
+
+# target to preprocess a source file
+src/docking_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/docking_node.dir/build.make my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.i
+.PHONY : src/docking_node.cpp.i
+
+src/docking_node.s: src/docking_node.cpp.s
+
+.PHONY : src/docking_node.s
+
+# target to generate assembly for a file
+src/docking_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/docking_node.dir/build.make my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.s
+.PHONY : src/docking_node.cpp.s
+
 src/doorway_detection_node.o: src/doorway_detection_node.cpp.o
 
 .PHONY : src/doorway_detection_node.o
@@ -1287,6 +1329,7 @@ help:
 	@echo "... geometry_msgs_generate_messages_nodejs"
 	@echo "... tf_generate_messages_py"
 	@echo "... sensor_msgs_generate_messages_py"
+	@echo "... docking_node"
 	@echo "... topic_tools_generate_messages_eus"
 	@echo "... pcl_msgs_generate_messages_lisp"
 	@echo "... geometry_msgs_generate_messages_py"
@@ -1317,6 +1360,9 @@ help:
 	@echo "... nodelet_topic_tools_gencfg"
 	@echo "... actionlib_msgs_generate_messages_cpp"
 	@echo "... std_srvs_generate_messages_cpp"
+	@echo "... src/docking_node.o"
+	@echo "... src/docking_node.i"
+	@echo "... src/docking_node.s"
 	@echo "... src/doorway_detection_node.o"
 	@echo "... src/doorway_detection_node.i"
 	@echo "... src/doorway_detection_node.s"

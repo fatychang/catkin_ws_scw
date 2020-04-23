@@ -21,7 +21,7 @@
 ros::Publisher pub1, pub2;
 
 // Parameters for image processing
-float leave_size = 0.05;
+float leaf_size = 0.05;
 int meanK = 50;
 float epsAngle = 30.0f;
 
@@ -46,7 +46,7 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
     //  Downsample - VoxelGrid   //
     pcl::VoxelGrid<pcl::PointXYZ> vox;
     vox.setInputCloud(origin_cloud);
-    vox.setLeafSize(leave_size, leave_size, leave_size);
+    vox.setLeafSize(leaf_size, leaf_size, leaf_size);
     vox.filter(*filtered_cloud);
     // ROS_INFO("[DEBUG] Size of filtered cloud:%d", filtered_cloud->size());
 
@@ -228,7 +228,7 @@ static void showUsage(std::string name)
 	std::cerr << "Usage: " << name << "option(s) SOURCES"
 			<< "Options:\n"
 			<< "\t -h, --help \t\t Show this help message\n"
-			<< "\t -l, --leave \t\t Leave size of the VoxelGrid filter (Default is 0.08)\n"
+			<< "\t -l, --leaf \t\t leaf_size size of the VoxelGrid filter (Default is 0.08)\n"
 			<< "\t -a, --angle \t\t eps angle for the plane detection (Default is 30 degs.)\n" 
             << "\t -k, --meanK \t\t meanK for the statistical outlier removal (Default is 50)"<<std::endl;
 }
@@ -256,7 +256,7 @@ int main(int argc, char **argv)
 		}
 		else if((arg == "-l") || (arg == "-leave"))
 		{
-			leave_size = std::stof(argv[i+1]);
+			leaf_size = std::stof(argv[i+1]);
 		}
 		else if((arg == "-a") || (arg == "-angle"))
 		{

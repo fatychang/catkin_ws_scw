@@ -10,6 +10,9 @@ std::vector<float> points;
  */
 void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
 {
+    // clear the vector
+    points.clear();
+
     int numOfMsgs = point_msg ->data.size();
     //ROS_INFO("numOfPoints: %d", numOfMsgs/3);
     for (size_t i=0; i< numOfMsgs; ++i)

@@ -948,6 +948,19 @@ sensor_msgs_generate_messages_py/fast:
 .PHONY : sensor_msgs_generate_messages_py/fast
 
 #=============================================================================
+# Target rules for targets named docking_node
+
+# Build rule for target.
+docking_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 docking_node
+.PHONY : docking_node
+
+# fast build rule for target.
+docking_node/fast:
+	$(MAKE) -f my_image_processor/CMakeFiles/docking_node.dir/build.make my_image_processor/CMakeFiles/docking_node.dir/build
+.PHONY : docking_node/fast
+
+#=============================================================================
 # Target rules for targets named topic_tools_generate_messages_eus
 
 # Build rule for target.
@@ -1410,6 +1423,7 @@ help:
 	@echo "... geometry_msgs_generate_messages_nodejs"
 	@echo "... tf_generate_messages_py"
 	@echo "... sensor_msgs_generate_messages_py"
+	@echo "... docking_node"
 	@echo "... topic_tools_generate_messages_eus"
 	@echo "... pcl_msgs_generate_messages_lisp"
 	@echo "... geometry_msgs_generate_messages_py"
