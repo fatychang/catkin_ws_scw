@@ -164,7 +164,7 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
             {
                 // get the gap start position
                 gapStart = searchPoint;
-                ROS_INFO("gap_start_pt: (%f, %f, %f)",gapStart.x, gapStart.y, gapStart.z);
+                // ROS_INFO("gap_start_pt: (%f, %f, %f)",gapStart.x, gapStart.y, gapStart.z);
             }
             else if(numOfNeighbors !=0 && numOfNeighborsPrev == 0)
             {
@@ -176,11 +176,11 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
                 center.x = (gapStart.x+gapEnd.x)/2;
                 center.y = min_y;
                 center.z = (gapStart.z+gapEnd.z)/2;
-                ROS_INFO("gap_end_pt: (%f, %f, %f)",center.x, center.y, center.z);
+                // ROS_INFO("gap_end_pt: (%f, %f, %f)",center.x, center.y, center.z);
 
 
                 gapPtsMsg.data.push_back(gapStart.x), gapPtsMsg.data.push_back(gapStart.y),gapPtsMsg.data.push_back(gapStart.z);
-                //gapPtsMsg.data.push_back(gapEnd.x), gapPtsMsg.data.push_back(gapEnd.y),gapPtsMsg.data.push_back(gapEnd.z);
+                gapPtsMsg.data.push_back(gapEnd.x), gapPtsMsg.data.push_back(gapEnd.y),gapPtsMsg.data.push_back(gapEnd.z);
                 gapPtsMsg.data.push_back(center.x), gapPtsMsg.data.push_back(center.y),gapPtsMsg.data.push_back(center.z);
 
 
@@ -207,17 +207,6 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
     pub1.publish(output);
     pub2.publish(gapPtsMsg);
     
-
-
-
-
-
-
-
-
-
-                                
-
 }
 
 /** @brief Shows all the parse message usage.
@@ -254,7 +243,7 @@ int main(int argc, char **argv)
 			showUsage(argv[0]);
 			return 0;
 		}
-		else if((arg == "-l") || (arg == "-leave"))
+		else if((arg == "-l") || (arg == "-leaf"))
 		{
 			leaf_size = std::stof(argv[i+1]);
 		}

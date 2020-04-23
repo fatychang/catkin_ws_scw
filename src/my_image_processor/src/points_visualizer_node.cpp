@@ -3,10 +3,12 @@
 #include "std_msgs/Float32MultiArray.h"
 
 
-ros::Publisher marker_pub1, marker_pub2;
+ros::Publisher marker_pub;
 std::vector<float> points;
+float scale = 0.1f;
+
 /** @brief This callback updates the point position received from the topic.
- * 
+ *  
  */
 void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
 {
@@ -19,46 +21,79 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
     {
         points.push_back(point_msg->data[i]);
     }
-    // std::cout << "points:(" << points[0] << "," << points[1] << "," << points[1] << std::endl;
+    
 
-    visualization_msgs::Marker marker_pts1, marker_pts2;
-    marker_pts1.header.frame_id = marker_pts2.header.frame_id = "/camera_link";
-    marker_pts1.ns = marker_pts2.ns = "points";
-    marker_pts1.action = marker_pts2.action = visualization_msgs::Marker::ADD;
-    marker_pts1.pose.orientation.w = marker_pts2.pose.orientation.w = 1.0;
-    marker_pts1.id = 0;
-    marker_pts2.id = 1;
-    marker_pts1.type = marker_pts2.type = visualization_msgs::Marker::SPHERE;
+    visualization_msgs::Marker marker_pts;
+    marker_pts.header.frame_id = "/camera_link";
+    marker_pts.action = visualization_msgs::Marker::ADD;
+    marker_pts.pose.orientation.w = 1.0;
+    marker_pts.id = 0;
+    marker_pts.type = visualization_msgs::Marker::POINTS;
+    marker_pts.scale.x = scale;
+    marker_pts.scale.y = scale;
+    marker_pts.color.a = 1.0;
+    marker_pts.color.r = 1.0;
 
-    marker_pts1.scale.x = marker_pts2.scale.x = 0.1;
-    marker_pts1.scale.y = marker_pts2.scale.y = 0.1;
-    marker_pts1.color.a = marker_pts2.color.a =1.0;
+    // add the vertices
+    for(int i=0; i< numOfMsgs; i+=3)
+    {
+        geometry_msgs::Point p;
+        p.x = points[i];
+        p.y = points[i+1];
+        p.z = points[i+2];
+        marker_pts.points.push_back(p);
+        // std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << std::endl;
+    }
 
-    marker_pts1.color.r = 1.0f;
-    marker_pts2.color.b = 1.0f;
-
-
-    marker_pts1.pose.position.x = points[0], marker_pts1.pose.position.y = points[1], marker_pts1.pose.position.z = points[2];
-    marker_pts2.pose.position.x = points[3], marker_pts2.pose.position.y = points[4], marker_pts2.pose.position.z = points[5];
-    //marker_pts2.pose.position.x = (points[0] + points[3])/2, marker_pts2.pose.position.y = (points[1]+ points[4])/2, marker_pts2.pose.position.z = (points[2]+points[5])/2;
-
-    marker_pub1.publish(marker_pts1);
-    marker_pub2.publish(marker_pts2);
+    marker_pub.publish(marker_pts);
 
 }
 
-
-/** @brief The points visualizer node is responsible for visualize the markers in rviz.
+/** @brief Shows all the parse message usage.
  * 
+ */
+static void showUsage(std::string name)
+{
+	std::cerr << "Usage: " << name << "option(s) SOURCES"
+			<< "Options:\n"
+			<< "\t -h, --help \t\t Show this help message\n"
+			<< "\t -s, --scale \t\t scale of the points (Default is 0.1)\n" << std::endl;
+}
+
+
+/** @brief The points visualizer node is responsible for visualize the markers (points) in rviz.
+ *  The point visualizer node subscribes the pointInfo from other nodes and visualize them in the rviz.
+ *  The scale (size) of the points is adjustable using comments -s
  */
 int main(int argc, char **argv)
 {   
+    // Parse the commend line
+	for (int i=0; i<argc; ++i)
+	{
+		std::string arg = argv[i];
+
+		if ((arg == "-h") || (arg == "--help"))
+		{
+			showUsage(argv[0]);
+			return 0;
+		}
+		else if((arg == "-s") || (arg == "-scale"))
+		{
+			scale = std::stof(argv[i+1]);
+		}
+	}
+
     //ROS and node handle initialize 
     ros::init(argc, argv, "points_visualizer_node");
     ros::NodeHandle nh;
-    marker_pub1 = nh.advertise<visualization_msgs::Marker> ("points_visualizer1", 10);
-    marker_pub2 = nh.advertise<visualization_msgs::Marker> ("points_visualizer2", 10);
-    ros::Rate(30);
+
+    ROS_INFO("[DEBUG] points_visualizer_node is running...");
+
+    // Declare the publisher
+    marker_pub = nh.advertise<visualization_msgs::Marker> ("points_visualizer", 10);
+
+    // restrict the frequency to allow the user to rotate the view in rviz.
+    ros::Rate(1);
 
     // Subscribe the pose of the points
     ros::Subscriber sub = nh.subscribe("pointInfo", 1, clbk);
