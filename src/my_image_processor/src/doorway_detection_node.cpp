@@ -229,6 +229,8 @@ static void showUsage(std::string name)
  * 1. Downsampling with the Voxelgrid
  * 2. Find the plane (inliers) with RANSAC
  * 3. Project the inliers to the plance
+ * 
+ * [NOTED] The image from the camera is required to roate 90 degress to match the actual world axis.
  */
 int main(int argc, char **argv)
 {

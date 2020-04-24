@@ -2,6 +2,7 @@
 
 // message
 #include "sensor_msgs/PointCloud2.h"
+#include "std_msgs/Float32MultiArray.h"
 
 
 // image processing
@@ -10,7 +11,7 @@
 #include "pcl/filters/passthrough.h"
 
 // Declare publisher
-ros::Publisher pub;
+ros::Publisher pub, pub2;
 
 // Parameters for image processing
 float leaf_size = 0.1;
@@ -26,6 +27,13 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
     pcl::PointCloud<pcl::PointXYZ>::Ptr origin_cloud (new pcl::PointCloud<pcl::PointXYZ>),
                                         filtered_cloud (new pcl::PointCloud<pcl::PointXYZ>),
                                         table_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+
+	
+	std_msgs::Float32MultiArray PtsMsg;		//message that will be published to ROS master
+	PtsMsg.data.clear();
+	// std::vector<float> pts;						//points that will be added to the messages and published
+	// pts.clear();
+
     
     // Convert the ROS message to the PCLPointCloud2
     pcl_conversions::toPCL(*cloud_msg, pcl_pc2);
@@ -50,20 +58,26 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
             min_y_id = i;
         }
     }
-    std::cout << "[DEBUG]: the minimum y:" << min_y << std::endl;
+    std::cout << "[DEBUG]: the minimum y:" << min_y << " at " << min_y_id << std::endl;
+	PtsMsg.data.push_back(filtered_cloud->points[min_y_id].x), PtsMsg.data.push_back(filtered_cloud->points[min_y_id].y), PtsMsg.data.push_back(filtered_cloud->points[min_y_id].z);
+	PtsMsg.data.push_back(filtered_cloud->points[0].x), PtsMsg.data.push_back(filtered_cloud->points[0].y), PtsMsg.data.push_back(filtered_cloud->points[0].z);
 
-    pcl::PassThrough<pcl::PointXYZ> pass;
-    pass.setInputCloud(filtered_cloud);
-    pass.setFilterFieldName("y");
-    pass.setFilterLimits((min_y + 0.3f), 5);      // higher than ground for 30cm
-    pass.filter(*filtered_cloud);
-    std::cout << "[DEBUG]: the number of points (pass):" << filtered_cloud->points.size() << std::endl;
+
+    // pcl::PassThrough<pcl::PointXYZ> pass;
+    // pass.setInputCloud(filtered_cloud);
+    // pass.setFilterFieldName("y");
+    // pass.setFilterLimits((min_y + 0.3f), 5);      // higher than ground for 30cm
+    // pass.filter(*filtered_cloud);
+    // std::cout << "[DEBUG]: the number of points (pass):" << filtered_cloud->points.size() << std::endl;
 
 
     // Convert to ROS message data type and publish
     sensor_msgs::PointCloud2 output;
     pcl::toROSMsg(*filtered_cloud.get(), output);
     pub.publish(output);
+
+	// publish std_message::Float32Array containing the points information
+	pub2.publish(PtsMsg);
 }
 
 /** @brief Shows all the parse message usage.
@@ -142,6 +156,7 @@ int main(int argc, char **argv)
 	  * buffer up before throwing some away.
 	  */
      pub = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
+	 pub2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo", 1);
 
      ros::spin();
 

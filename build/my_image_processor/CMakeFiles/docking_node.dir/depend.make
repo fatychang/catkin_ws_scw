@@ -66,7 +66,10 @@ my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/
 my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/sensor_msgs/Image.h
 my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/sensor_msgs/PointCloud2.h
 my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/sensor_msgs/PointField.h
+my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/std_msgs/Float32MultiArray.h
 my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/std_msgs/Header.h
+my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/std_msgs/MultiArrayDimension.h
+my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/std_msgs/MultiArrayLayout.h
 my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/xmlrpcpp/XmlRpcDecl.h
 my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /opt/ros/melodic/include/xmlrpcpp/XmlRpcValue.h
 my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o: /usr/include/eigen3/Eigen/Cholesky
