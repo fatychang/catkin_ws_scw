@@ -5,4 +5,7 @@
         <arg name="world_name" value="$(find my_rgbd_gazebo)/worlds/table_world.world"/>
         <!--more default paramteres can be changed here-->
     </include>
+
+    <!--launch rviz-->
+    <node name="rviz" pkg="rviz" type="rviz" respawn="false"/>
 </launch>
