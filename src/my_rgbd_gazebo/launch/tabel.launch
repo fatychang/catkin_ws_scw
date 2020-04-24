@@ -8,4 +8,7 @@
 
     <!--launch rviz-->
     <node name="rviz" pkg="rviz" type="rviz" respawn="false"/>
+
+    <!--launch the node to add noise to the depth information-->
+    <node name="noise_node" pkg="my_image_processor" type="noise_node" respawn="false"/>
 </launch>
