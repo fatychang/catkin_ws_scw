@@ -92,6 +92,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	seg.setDistanceThreshold(0.2);
 	seg.setInputCloud(filtered_cloud);
 	seg.segment(*inliers, *coefficient);
+	//std::cout << "[DEBUG]: coefficient: (" << coefficient->values[0] << " " << coefficient->values[1] << " " << coefficient->values[2] << std::endl;
 
 	// filter the outliers
 	pcl::ExtractIndices<pcl::PointXYZ> extract;
@@ -101,13 +102,38 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	}
 	else
 	{
-        ROS_INFO("[DEBUG]: The number of inliers:%d", inliers->indices.size() );
+        // ROS_INFO("[DEBUG]: The number of inliers:%d", inliers->indices.size() );
 
 		// extract the inliers (keep the inliers)
 		extract.setInputCloud(filtered_cloud);
 		extract.setIndices(inliers);
 		extract.setNegative(false);
 		extract.filter(*table_cloud);
+
+		// Check whether the candidate satisfies the following thress constrains.
+		if(fabs(coefficient->values[1]) > 0.98) 							// 1. plane is perpendicular to the ground
+		{
+			int minimul_num_of_points = 100;
+			if(table_cloud->points.size() > minimul_num_of_points)			// 2. the number of points exceed a certain threshold
+			{
+				// calculate the average height (y) of all the points in the plane
+				float avgTableHeight = 0.0;
+				for (int i=0; i< table_cloud->points.size(); ++i)
+				{
+					avgTableHeight+=table_cloud->points[i].y;
+				}
+				avgTableHeight /= table_cloud->points.size();
+				// std::cout << "[DEBUG]: avg height: " << avgTableHeight << std::endl;
+
+				float camera_height = 1.3;
+				float minimul_table_height = 0.7112;  //around 28'
+				if(avgTableHeight < camera_height - minimul_table_height)	// 3. the height of the table exceeds the threshold
+				{
+					
+				}
+			}
+
+		}
 	}
 
 
