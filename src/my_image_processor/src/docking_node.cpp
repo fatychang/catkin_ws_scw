@@ -10,6 +10,9 @@
 #include "pcl/filters/voxel_grid.h"
 #include "pcl/segmentation/sac_segmentation.h"
 #include "pcl/filters/extract_indices.h"
+#include "pcl/filters/project_inliers.h"
+#include "pcl/surface/convex_hull.h"
+
 
 //#include "pcl/filters/passthrough.h"
 
@@ -129,7 +132,28 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 				float minimul_table_height = 0.7112;  //around 28'
 				if(avgTableHeight < camera_height - minimul_table_height)	// 3. the height of the table exceeds the threshold
 				{
-					
+					// project the model inliers to the plane
+					pcl::ProjectInliers<pcl::PointXYZ> proj;
+					proj.setModelType(pcl::SACMODEL_NORMAL_PARALLEL_PLANE);
+					proj.setModelCoefficients(coefficient);
+					proj.setInputCloud(table_cloud);
+					proj.filter(*table_cloud);
+
+					// create a Convex Hull representation
+					pcl::PointCloud<pcl::PointXYZ>::Ptr hull_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+					pcl::ConvexHull<pcl::PointXYZ> hull;
+					hull.setInputCloud(table_cloud);
+					hull.reconstruct(*hull_cloud);
+
+					// update points to the message for visualization
+					for(int i=0; i<hull_cloud->points.size(); ++i)
+					{
+						pcl::PointXYZ p;
+						p.x = hull_cloud->points[i].x; p.y = hull_cloud->points[i].y; p.z = hull_cloud->points[i].z; 
+						PtsMsg.data.push_back(p.x); PtsMsg.data.push_back(p.y); PtsMsg.data.push_back(p.z); 						
+					}
+
+
 				}
 			}
 
