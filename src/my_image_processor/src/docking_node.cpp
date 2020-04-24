@@ -8,10 +8,16 @@
 // image processing
 #include "pcl_conversions/pcl_conversions.h"
 #include "pcl/filters/voxel_grid.h"
-#include "pcl/filters/passthrough.h"
+#include "pcl/segmentation/sac_segmentation.h"
+#include "pcl/filters/extract_indices.h"
+
+//#include "pcl/filters/passthrough.h"
+
+// others
+#include <Eigen/Dense>
 
 // Declare publisher
-ros::Publisher pub, pub2;
+ros::Publisher pub_obj, pub_filtered, pub_pts;
 
 // Parameters for image processing
 float leaf_size = 0.1;
@@ -45,39 +51,77 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
     vox.setInputCloud(origin_cloud);
     vox.setLeafSize(leaf_size, leaf_size, leaf_size);
     vox.filter(*filtered_cloud);
-    std::cout << "[DEBUG]: the number of points:" << filtered_cloud->points.size() << std::endl;
+    //std::cout << "[DEBUG]: the number of points:" << filtered_cloud->points.size() << std::endl;
 
     // Remove the ground plane with pass through filter (can use transfer function to replace the min_y part)
-    float min_y = filtered_cloud -> points[0].y;
-    int min_y_id;
+    // [NOTE 1] The image from the camera is required to roate 90 degress to match the actual world axis. 
+	// Therefor, the minimun of y is now the maximun of y.
+	// [Note 2] This only works that the camera has zero pitch.
+	float max_y = filtered_cloud -> points[0].y;
+    int max_y_id;
     for (int i=1; i<filtered_cloud->points.size(); ++i)
     {
-        if(filtered_cloud->points[i].y < min_y)
+        if(filtered_cloud->points[i].y > max_y)
         {
-            min_y = filtered_cloud->points[i].y;
-            min_y_id = i;
+            max_y = filtered_cloud->points[i].y;
+            max_y_id = i;
         }
     }
-    std::cout << "[DEBUG]: the minimum y:" << min_y << " at " << min_y_id << std::endl;
-	PtsMsg.data.push_back(filtered_cloud->points[min_y_id].x), PtsMsg.data.push_back(filtered_cloud->points[min_y_id].y), PtsMsg.data.push_back(filtered_cloud->points[min_y_id].z);
-	PtsMsg.data.push_back(filtered_cloud->points[0].x), PtsMsg.data.push_back(filtered_cloud->points[0].y), PtsMsg.data.push_back(filtered_cloud->points[0].z);
+    //std::cout << "[DEBUG]: the minimum y:" << max_y << " at " << max_y_id << std::endl;
+	//PtsMsg.data.push_back(filtered_cloud->points[max_y_id].x), PtsMsg.data.push_back(filtered_cloud->points[max_y_id].y), PtsMsg.data.push_back(filtered_cloud->points[max_y_id].z);
 
 
     // pcl::PassThrough<pcl::PointXYZ> pass;
     // pass.setInputCloud(filtered_cloud);
     // pass.setFilterFieldName("y");
-    // pass.setFilterLimits((min_y + 0.3f), 5);      // higher than ground for 30cm
+    // pass.setFilterLimits(-5, max_y-0.01f);      // higher than ground for 30cm
     // pass.filter(*filtered_cloud);
-    // std::cout << "[DEBUG]: the number of points (pass):" << filtered_cloud->points.size() << std::endl;
+    //std::cout << "[DEBUG]: the number of points (pass):" << filtered_cloud->points.size() << std::endl;
+
+	// RANSAC to search the potential table surface
+	pcl::ModelCoefficients::Ptr coefficient (new pcl::ModelCoefficients);
+	pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+	pcl::SACSegmentation<pcl::PointXYZ> seg;
+	Eigen::Vector3f axis = Eigen::Vector3f(0.0, 1.0, 0.0);
+
+	seg.setOptimizeCoefficients(true);
+	seg.setModelType(pcl::SACMODEL_PERPENDICULAR_PLANE);
+	seg.setMethodType(pcl::SAC_RANSAC);
+	seg.setAxis(axis);
+	//seg.setEpsAngle()
+	seg.setDistanceThreshold(0.2);
+	seg.setInputCloud(filtered_cloud);
+	seg.segment(*inliers, *coefficient);
+
+	// filter the outliers
+	pcl::ExtractIndices<pcl::PointXYZ> extract;
+	if(inliers->indices.size() == 0)
+	{
+		ROS_INFO("Table not found. Keep searching...");
+	}
+	else
+	{
+        ROS_INFO("[DEBUG]: The number of inliers:%d", inliers->indices.size() );
+
+		// extract the inliers (keep the inliers)
+		extract.setInputCloud(filtered_cloud);
+		extract.setIndices(inliers);
+		extract.setNegative(false);
+		extract.filter(*table_cloud);
+	}
+
+
 
 
     // Convert to ROS message data type and publish
-    sensor_msgs::PointCloud2 output;
+    sensor_msgs::PointCloud2 output, output2;
     pcl::toROSMsg(*filtered_cloud.get(), output);
-    pub.publish(output);
+    pcl::toROSMsg(*table_cloud.get(), output2);
+    pub_filtered.publish(output);
+    pub_obj.publish(output2);
 
 	// publish std_message::Float32Array containing the points information
-	pub2.publish(PtsMsg);
+	pub_pts.publish(PtsMsg);
 }
 
 /** @brief Shows all the parse message usage.
@@ -155,8 +199,9 @@ int main(int argc, char **argv)
 	  * than we can send them, the number here specifies how many messages to
 	  * buffer up before throwing some away.
 	  */
-     pub = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
-	 pub2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo", 1);
+     pub_obj = nh.advertise<sensor_msgs::PointCloud2>("object_cloud", 1);
+     pub_filtered = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
+	 pub_pts = nh.advertise<std_msgs::Float32MultiArray>("pointInfo", 1);
 
      ros::spin();
 

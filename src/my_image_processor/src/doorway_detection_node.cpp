@@ -18,7 +18,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-ros::Publisher pub1, pub2;
+ros::Publisher pub_obj, pub_filtered, pub_pts;
+
 
 // Parameters for image processing
 float leaf_size = 0.05;
@@ -202,10 +203,12 @@ void doorwayCallback(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
     }
 
     // Convert to ROS message data type
-    sensor_msgs::PointCloud2 output;
-    pcl::toROSMsg(*door_cloud.get(), output);
-    pub1.publish(output);
-    pub2.publish(gapPtsMsg);
+    sensor_msgs::PointCloud2 output, output2;
+    pcl::toROSMsg(*filtered_cloud.get(), output);
+    pcl::toROSMsg(*door_cloud.get(), output2);
+    pub_filtered.publish(output);
+    pub_obj.publish(output2);
+    pub_pts.publish(gapPtsMsg);
     
 }
 
@@ -313,8 +316,9 @@ int main(int argc, char **argv)
 	  * than we can send them, the number here specifies how many messages to
 	  * buffer up before throwing some away.
 	  */
-    pub1 = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
-    pub2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo",1);
+    pub_obj = nh.advertise<sensor_msgs::PointCloud2>("object_cloud", 1);
+    pub_filtered = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
+    pub_pts= nh.advertise<std_msgs::Float32MultiArray>("pointInfo",1);
 
     ros::spin();
 
