@@ -18,14 +18,18 @@
 
 // others
 #include <Eigen/Dense>
+#include <opencv2/core/eigen.hpp>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 // Declare publisher
-ros::Publisher pub_obj, pub_filtered, pub_pts;
+ros::Publisher pub_obj, pub_filtered, pub_pts, pub_pts2;
 
 // Parameters for image processing
 float leaf_size = 0.1;
 int meanK = 50;
 float epsAngle = 30.0f;
+int p = 0;
 
 /** @brief The callback process the raw depth information to find the suitable docking location.
  * 
@@ -38,8 +42,9 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
                                         table_cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
 	
-	std_msgs::Float32MultiArray PtsMsg;		//message that will be published to ROS master
-	PtsMsg.data.clear();
+	std_msgs::Float32MultiArray ptsMsg, ptsMsg2;		//message that will be published to ROS master
+	ptsMsg.data.clear();
+	ptsMsg2.data.clear();
 	// std::vector<float> pts;						//points that will be added to the messages and published
 	// pts.clear();
 
@@ -150,11 +155,92 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					{
 						pcl::PointXYZ p;
 						p.x = hull_cloud->points[i].x; p.y = hull_cloud->points[i].y; p.z = hull_cloud->points[i].z; 
-						PtsMsg.data.push_back(p.x); PtsMsg.data.push_back(p.y); PtsMsg.data.push_back(p.z); 						
+						ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
 					}
+					// std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;
 
 
+
+					// find the min & max in the x and z direction
+					float min_x = table_cloud->points[0].x, min_z = table_cloud->points[0].z, max_x = table_cloud->points[0].x, max_z = table_cloud->points[0].z;
+					int min_x_id = 0, min_z_id = 0, max_x_id = 0, max_z_id = 0;
+					for (int i=1; i<table_cloud->points.size(); ++i)
+					{
+						if(table_cloud->points[i].x < min_x)
+						{
+							min_x = table_cloud->points[i].x;
+							min_x_id = i;
+						}
+						if(table_cloud->points[i].x > max_x)
+						{
+							max_x = table_cloud->points[i].x;
+							max_x_id = i;
+						}
+						if(table_cloud->points[i].z < min_z)
+						{
+							min_z = table_cloud->points[i].z;
+							min_z_id = i;
+						}
+						if(table_cloud->points[i].z > max_z)
+						{
+							max_z = table_cloud->points[i].z;
+							max_z_id = i;
+						}
+					}
+					// ptsMsg2.data.push_back(table_cloud->points[min_x_id].x); ptsMsg2.data.push_back(table_cloud->points[min_x_id].y); ptsMsg2.data.push_back(table_cloud->points[min_x_id].z); 						
+					// ptsMsg2.data.push_back(table_cloud->points[max_x_id].x); ptsMsg2.data.push_back(table_cloud->points[max_x_id].y); ptsMsg2.data.push_back(table_cloud->points[max_x_id].z); 						
+					// ptsMsg2.data.push_back(table_cloud->points[min_z_id].x); ptsMsg2.data.push_back(table_cloud->points[min_z_id].y); ptsMsg2.data.push_back(table_cloud->points[min_z_id].z); 						
+					// ptsMsg2.data.push_back(table_cloud->points[max_z_id].x); ptsMsg2.data.push_back(table_cloud->points[max_z_id].y); ptsMsg2.data.push_back(table_cloud->points[max_z_id].z); 
+
+
+					// generate the grid
+					float step_size = 0.05;
+					const int grid_x = (max_x - min_x) / step_size, grid_z = (max_z - min_z) / step_size;	
+					Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> grid(grid_z, grid_x);
+
+					
+					//std::cout << "grid_x:" << grid_x << " 	grid_z:" << grid_z << std::endl;
+					int cnt = 0;
+					for(int i=0; i< grid_x; ++i)
+					{
+						for(int j=0; j < grid_z; ++j)
+						{
+							for (int k=0; k < hull_cloud->points.size(); ++k)
+							{
+								if((hull_cloud->points[k].z >= min_z + j *step_size) && (hull_cloud->points[k].z < min_z + (j+1) *step_size))
+								{
+									if((hull_cloud->points[k].x >= min_x + i *step_size) && (hull_cloud->points[k].x < min_x + (i+1) *step_size))
+									{
+										cnt++;
+										grid(j, i) = 1;
+										break;
+									}
+								}
+								else
+								{
+									grid(j, i) = 0;
+								}
+							}							
+							// grid visualization
+							ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size); 
+						}
+					}
+					// std::cout << "{DEBUG]: number of points detected in the grid:" << ++cnt << std::endl;
+
+					// convert Eigen::Matrix to cv
+					cv::Mat_<int> cMat = cv::Mat_<int>::ones(grid_z, grid_x);
+					cv::eigen2cv(grid, cMat);
+					// std::cout << "[DEBUG]: image type: " << cMat.type() << std::endl;
+					cv::Mat cMat_8U;
+					cMat.convertTo(cMat_8U,CV_8UC1);
+					//std::cout << "[DEBUG]: image type: " << cMat_8U.type() << std::endl;
+
+
+					std::vector<cv::Vec4i> lines;
+					cv::HoughLinesP(cMat_8U, lines, 1, CV_PI/180, p, 0, 0);
+					std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
 				}
+
 			}
 
 		}
@@ -171,7 +257,8 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
     pub_obj.publish(output2);
 
 	// publish std_message::Float32Array containing the points information
-	pub_pts.publish(PtsMsg);
+	pub_pts.publish(ptsMsg);
+	pub_pts2.publish(ptsMsg2);
 }
 
 /** @brief Shows all the parse message usage.
@@ -184,7 +271,7 @@ static void showUsage(std::string name)
 			<< "\t -h, --help \t\t Show this help message\n"
 			<< "\t -l, --leaf \t\t leaf_size size of the VoxelGrid filter (Default is 0.1)\n"
 			<< "\t -a, --angle \t\t eps angle for the plane detection (Default is 30 degs.)\n" 
-            << "\t -k, --meanK \t\t meanK for the statistical outlier removal (Default is 50)"<<std::endl;
+            << "\t -p, --param \t\t tmp param for tuning params"<<std::endl;
 }
 
 /** @brief This node processes the depth input (ploint cloud) and to find the suitable docking location.
@@ -195,6 +282,30 @@ static void showUsage(std::string name)
  */
 int main(int argc, char **argv)
 {
+	// Parse the commend line
+	for (int i=0; i<argc; ++i)
+	{
+		std::string arg = argv[i];
+
+		if ((arg == "-h") || (arg == "--help"))
+		{
+			showUsage(argv[0]);
+			return 0;
+		}
+		else if((arg == "-l") || (arg == "-leaf"))
+		{
+			leaf_size = std::stof(argv[i+1]);
+		}
+		else if((arg == "-a") || (arg == "-angle"))
+		{
+			epsAngle = std::stof(argv[i+1]);
+		}
+        else if((arg == "-p") || (arg == "-param"))
+		{
+			p = std::stof(argv[i+1]);
+		}
+	}
+
     /**
 	 * The ros::init() function needs to see argc and argv so that it can perform
 	 * any ROS arguments and name remapping that were provided at the command line.
@@ -252,6 +363,7 @@ int main(int argc, char **argv)
      pub_obj = nh.advertise<sensor_msgs::PointCloud2>("object_cloud", 1);
      pub_filtered = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
 	 pub_pts = nh.advertise<std_msgs::Float32MultiArray>("pointInfo", 1);
+	 pub_pts2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo2", 1);
 
      ros::spin();
 

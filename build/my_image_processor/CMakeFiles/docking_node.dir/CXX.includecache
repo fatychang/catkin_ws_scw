@@ -27,6 +27,12 @@ pcl/surface/convex_hull.h
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/pcl/surface/convex_hull.h
 Eigen/Dense
 -
+opencv2/core/eigen.hpp
+-
+opencv2/highgui/highgui.hpp
+/media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/opencv2/highgui/highgui.hpp
+opencv2/imgproc/imgproc.hpp
+/media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/opencv2/imgproc/imgproc.hpp
 
 /opt/ros/melodic/include/pcl_conversions/pcl_conversions.h
 vector
