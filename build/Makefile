@@ -740,6 +740,19 @@ sensor_msgs_generate_messages_nodejs/fast:
 .PHONY : sensor_msgs_generate_messages_nodejs/fast
 
 #=============================================================================
+# Target rules for targets named lines_visualizer_node
+
+# Build rule for target.
+lines_visualizer_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 lines_visualizer_node
+.PHONY : lines_visualizer_node
+
+# fast build rule for target.
+lines_visualizer_node/fast:
+	$(MAKE) -f my_image_processor/CMakeFiles/lines_visualizer_node.dir/build.make my_image_processor/CMakeFiles/lines_visualizer_node.dir/build
+.PHONY : lines_visualizer_node/fast
+
+#=============================================================================
 # Target rules for targets named sensor_msgs_generate_messages_eus
 
 # Build rule for target.
@@ -1407,6 +1420,7 @@ help:
 	@echo "... pcl_ros_gencfg"
 	@echo "... actionlib_generate_messages_cpp"
 	@echo "... sensor_msgs_generate_messages_nodejs"
+	@echo "... lines_visualizer_node"
 	@echo "... sensor_msgs_generate_messages_eus"
 	@echo "... noise_node"
 	@echo "... sensor_msgs_generate_messages_cpp"

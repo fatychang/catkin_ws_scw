@@ -23,7 +23,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 // Declare publisher
-ros::Publisher pub_obj, pub_filtered, pub_pts, pub_pts2;
+ros::Publisher pub_obj, pub_filtered, pub_pts, pub_pts2, pub_line;
 
 // Parameters for image processing
 float leaf_size = 0.1;
@@ -42,9 +42,10 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
                                         table_cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
 	
-	std_msgs::Float32MultiArray ptsMsg, ptsMsg2;		//message that will be published to ROS master
+	std_msgs::Float32MultiArray ptsMsg, ptsMsg2, lineMsg;		//message that will be published to ROS master
 	ptsMsg.data.clear();
 	ptsMsg2.data.clear();
+	lineMsg.data.clear();
 	// std::vector<float> pts;						//points that will be added to the messages and published
 	// pts.clear();
 
@@ -150,12 +151,13 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					hull.setInputCloud(table_cloud);
 					hull.reconstruct(*hull_cloud);
 
-					// update points to the message for visualization
+					// update points to the message for visualization - hull_could point
 					for(int i=0; i<hull_cloud->points.size(); ++i)
 					{
 						pcl::PointXYZ p;
 						p.x = hull_cloud->points[i].x; p.y = hull_cloud->points[i].y; p.z = hull_cloud->points[i].z; 
 						ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
+						//lineMsg.data.push_back(p.x); lineMsg.data.push_back(p.y); lineMsg.data.push_back(p.z); 	
 					}
 					// std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;
 
@@ -222,23 +224,29 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 								}
 							}							
 							// grid visualization
-							ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size); 
+							//ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size); 
 						}
 					}
 					// std::cout << "{DEBUG]: number of points detected in the grid:" << ++cnt << std::endl;
 
-					// convert Eigen::Matrix to cv
-					cv::Mat_<int> cMat = cv::Mat_<int>::ones(grid_z, grid_x);
-					cv::eigen2cv(grid, cMat);
-					// std::cout << "[DEBUG]: image type: " << cMat.type() << std::endl;
-					cv::Mat cMat_8U;
-					cMat.convertTo(cMat_8U,CV_8UC1);
-					//std::cout << "[DEBUG]: image type: " << cMat_8U.type() << std::endl;
+					// /////////// Detect the shape: retangle or circle?
+					// // convert Eigen::Matrix to cv
+					// cv::Mat_<int> cMat = cv::Mat_<int>::ones(grid_z, grid_x);
+					// cv::eigen2cv(grid, cMat);
+					// // std::cout << "[DEBUG]: image type: " << cMat.type() << std::endl;
+					// cv::Mat cMat_8U;
+					// cMat.convertTo(cMat_8U,CV_8UC1);
+					// //std::cout << "[DEBUG]: image type: " << cMat_8U.type() << std::endl;
 
 
-					std::vector<cv::Vec4i> lines;
-					cv::HoughLinesP(cMat_8U, lines, 1, CV_PI/180, p, 0, 0);
-					std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
+					// std::vector<cv::Vec4i> lines;
+					// cv::HoughLinesP(cMat_8U, lines, 1, CV_PI/180, p, 0, 0);
+					// std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
+					// // visualize the lines
+					// for (int i=0; i<lines.size(); ++i)
+					// {
+					// 	lineMsg.data.push_back(lines[i][0]), lineMsg.data.push_back(hull_cloud->points[1].y), lineMsg.data.push_back(lines[i][1]);
+					// }
 				}
 
 			}
@@ -259,6 +267,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	// publish std_message::Float32Array containing the points information
 	pub_pts.publish(ptsMsg);
 	pub_pts2.publish(ptsMsg2);
+	pub_line.publish(lineMsg);
 }
 
 /** @brief Shows all the parse message usage.
@@ -364,6 +373,7 @@ int main(int argc, char **argv)
      pub_filtered = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
 	 pub_pts = nh.advertise<std_msgs::Float32MultiArray>("pointInfo", 1);
 	 pub_pts2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo2", 1);
+	 pub_line = nh.advertise<std_msgs::Float32MultiArray>("lineInfo", 1);
 
      ros::spin();
 

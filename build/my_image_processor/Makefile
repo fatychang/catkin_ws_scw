@@ -468,6 +468,21 @@ sensor_msgs_generate_messages_nodejs/fast:
 .PHONY : sensor_msgs_generate_messages_nodejs/fast
 
 # Convenience name for target.
+my_image_processor/CMakeFiles/lines_visualizer_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/lines_visualizer_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/lines_visualizer_node.dir/rule
+
+# Convenience name for target.
+lines_visualizer_node: my_image_processor/CMakeFiles/lines_visualizer_node.dir/rule
+
+.PHONY : lines_visualizer_node
+
+# fast build rule for target.
+lines_visualizer_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/lines_visualizer_node.dir/build.make my_image_processor/CMakeFiles/lines_visualizer_node.dir/build
+.PHONY : lines_visualizer_node/fast
+
+# Convenience name for target.
 my_image_processor/CMakeFiles/sensor_msgs_generate_messages_eus.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/sensor_msgs_generate_messages_eus.dir/rule
 .PHONY : my_image_processor/CMakeFiles/sensor_msgs_generate_messages_eus.dir/rule
@@ -1226,6 +1241,33 @@ src/doorway_detection_node.cpp.s:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_node.cpp.s
 .PHONY : src/doorway_detection_node.cpp.s
 
+src/lines_visualizer_node.o: src/lines_visualizer_node.cpp.o
+
+.PHONY : src/lines_visualizer_node.o
+
+# target to build an object file
+src/lines_visualizer_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/lines_visualizer_node.dir/build.make my_image_processor/CMakeFiles/lines_visualizer_node.dir/src/lines_visualizer_node.cpp.o
+.PHONY : src/lines_visualizer_node.cpp.o
+
+src/lines_visualizer_node.i: src/lines_visualizer_node.cpp.i
+
+.PHONY : src/lines_visualizer_node.i
+
+# target to preprocess a source file
+src/lines_visualizer_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/lines_visualizer_node.dir/build.make my_image_processor/CMakeFiles/lines_visualizer_node.dir/src/lines_visualizer_node.cpp.i
+.PHONY : src/lines_visualizer_node.cpp.i
+
+src/lines_visualizer_node.s: src/lines_visualizer_node.cpp.s
+
+.PHONY : src/lines_visualizer_node.s
+
+# target to generate assembly for a file
+src/lines_visualizer_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/lines_visualizer_node.dir/build.make my_image_processor/CMakeFiles/lines_visualizer_node.dir/src/lines_visualizer_node.cpp.s
+.PHONY : src/lines_visualizer_node.cpp.s
+
 src/noise_node.o: src/noise_node.cpp.o
 
 .PHONY : src/noise_node.o
@@ -1312,6 +1354,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... actionlib_generate_messages_cpp"
 	@echo "... sensor_msgs_generate_messages_nodejs"
+	@echo "... lines_visualizer_node"
 	@echo "... sensor_msgs_generate_messages_eus"
 	@echo "... noise_node"
 	@echo "... sensor_msgs_generate_messages_cpp"
@@ -1366,6 +1409,9 @@ help:
 	@echo "... src/doorway_detection_node.o"
 	@echo "... src/doorway_detection_node.i"
 	@echo "... src/doorway_detection_node.s"
+	@echo "... src/lines_visualizer_node.o"
+	@echo "... src/lines_visualizer_node.i"
+	@echo "... src/lines_visualizer_node.s"
 	@echo "... src/noise_node.o"
 	@echo "... src/noise_node.i"
 	@echo "... src/noise_node.s"

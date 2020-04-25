@@ -23,25 +23,18 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
     }
     
 
-    // visualization_msgs::Marker marker_pts, marker_lineList;
     visualization_msgs::Marker marker_pts;
-    // marker_pts.header.frame_id = marker_lineList.header.frame_id = "/camera_link";
-    // marker_pts.action = marker_lineList.action = visualization_msgs::Marker::ADD;
-    // marker_pts.pose.orientation.w = marker_lineList.pose.orientation.w =  1.0;
+
     marker_pts.header.frame_id = "/camera_link";
     marker_pts.action = visualization_msgs::Marker::ADD;
     marker_pts.pose.orientation.w =  1.0;
     marker_pts.id = 0;
-    // marker_lineList.id = 1;
     marker_pts.type = visualization_msgs::Marker::POINTS;
-    // marker_lineList.type = visualization_msgs::Marker::LINE_LIST;
     marker_pts.scale.x = 0.01;
     marker_pts.scale.y = 0.01;
-    // marker_lineList.scale.x = 0.1;
     marker_pts.color.a = 1.0;
     marker_pts.color.r = 1.0;
-    // marker_lineList.color.a = 1.0;
-    // marker_lineList.color.g = 1.0;
+
     
 
     // add the vertices
