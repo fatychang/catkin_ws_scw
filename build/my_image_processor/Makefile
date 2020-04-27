@@ -168,6 +168,21 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+my_image_processor/CMakeFiles/inclide_detection_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/inclide_detection_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/inclide_detection_node.dir/rule
+
+# Convenience name for target.
+inclide_detection_node: my_image_processor/CMakeFiles/inclide_detection_node.dir/rule
+
+.PHONY : inclide_detection_node
+
+# fast build rule for target.
+inclide_detection_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/build
+.PHONY : inclide_detection_node/fast
+
+# Convenience name for target.
 my_image_processor/CMakeFiles/doorway_detection_node.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
 .PHONY : my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
@@ -1241,6 +1256,33 @@ src/doorway_detection_node.cpp.s:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_node.cpp.s
 .PHONY : src/doorway_detection_node.cpp.s
 
+src/inclide_detection_node.o: src/inclide_detection_node.cpp.o
+
+.PHONY : src/inclide_detection_node.o
+
+# target to build an object file
+src/inclide_detection_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/src/inclide_detection_node.cpp.o
+.PHONY : src/inclide_detection_node.cpp.o
+
+src/inclide_detection_node.i: src/inclide_detection_node.cpp.i
+
+.PHONY : src/inclide_detection_node.i
+
+# target to preprocess a source file
+src/inclide_detection_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/src/inclide_detection_node.cpp.i
+.PHONY : src/inclide_detection_node.cpp.i
+
+src/inclide_detection_node.s: src/inclide_detection_node.cpp.s
+
+.PHONY : src/inclide_detection_node.s
+
+# target to generate assembly for a file
+src/inclide_detection_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/src/inclide_detection_node.cpp.s
+.PHONY : src/inclide_detection_node.cpp.s
+
 src/lines_visualizer_node.o: src/lines_visualizer_node.cpp.o
 
 .PHONY : src/lines_visualizer_node.o
@@ -1331,6 +1373,7 @@ help:
 	@echo "... install"
 	@echo "... list_install_components"
 	@echo "... edit_cache"
+	@echo "... inclide_detection_node"
 	@echo "... doorway_detection_node"
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... install/strip"
@@ -1409,6 +1452,9 @@ help:
 	@echo "... src/doorway_detection_node.o"
 	@echo "... src/doorway_detection_node.i"
 	@echo "... src/doorway_detection_node.s"
+	@echo "... src/inclide_detection_node.o"
+	@echo "... src/inclide_detection_node.i"
+	@echo "... src/inclide_detection_node.s"
 	@echo "... src/lines_visualizer_node.o"
 	@echo "... src/lines_visualizer_node.i"
 	@echo "... src/lines_visualizer_node.s"

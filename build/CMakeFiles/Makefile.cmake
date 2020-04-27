@@ -312,6 +312,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "my_rgbd_gazebo/CMakeFiles/std_msgs_generate_messages_nodejs.dir/DependInfo.cmake"
   "my_rgbd_gazebo/CMakeFiles/roscpp_generate_messages_nodejs.dir/DependInfo.cmake"
   "my_rgbd_gazebo/CMakeFiles/std_msgs_generate_messages_py.dir/DependInfo.cmake"
+  "my_image_processor/CMakeFiles/inclide_detection_node.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/doorway_detection_node.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/DependInfo.cmake"
   "my_image_processor/CMakeFiles/tf2_msgs_generate_messages_py.dir/DependInfo.cmake"
