@@ -343,8 +343,10 @@ my_image_processor/CMakeFiles/docking_node.dir/src/docking_node.cpp.o
  /usr/include/pcl-1.8/pcl/filters/impl/filter.hpp
  /usr/include/pcl-1.8/pcl/filters/impl/filter_indices.hpp
  /usr/include/pcl-1.8/pcl/filters/impl/project_inliers.hpp
+ /usr/include/pcl-1.8/pcl/filters/impl/statistical_outlier_removal.hpp
  /usr/include/pcl-1.8/pcl/filters/impl/voxel_grid.hpp
  /usr/include/pcl-1.8/pcl/filters/project_inliers.h
+ /usr/include/pcl-1.8/pcl/filters/statistical_outlier_removal.h
  /usr/include/pcl-1.8/pcl/filters/voxel_grid.h
  /usr/include/pcl-1.8/pcl/for_each_type.h
  /usr/include/pcl-1.8/pcl/impl/cloud_iterator.hpp

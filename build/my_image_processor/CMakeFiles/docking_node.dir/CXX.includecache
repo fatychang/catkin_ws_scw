@@ -21,6 +21,8 @@ pcl/segmentation/sac_segmentation.h
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/pcl/segmentation/sac_segmentation.h
 pcl/filters/extract_indices.h
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/pcl/filters/extract_indices.h
+pcl/filters/statistical_outlier_removal.h
+-
 pcl/filters/project_inliers.h
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/pcl/filters/project_inliers.h
 pcl/surface/convex_hull.h
@@ -2466,6 +2468,12 @@ pcl/filters/filter_indices.h
 pcl/filters/project_inliers.h
 -
 
+/usr/include/pcl-1.8/pcl/filters/impl/statistical_outlier_removal.hpp
+pcl/filters/statistical_outlier_removal.h
+-
+pcl/common/io.h
+-
+
 /usr/include/pcl-1.8/pcl/filters/impl/voxel_grid.hpp
 pcl/common/centroid.h
 -
@@ -2512,6 +2520,14 @@ pcl/sample_consensus/sac_model_plane.h
 pcl/sample_consensus/sac_model_sphere.h
 -
 pcl/filters/impl/project_inliers.hpp
+-
+
+/usr/include/pcl-1.8/pcl/filters/statistical_outlier_removal.h
+pcl/filters/filter_indices.h
+-
+pcl/search/pcl_search.h
+-
+pcl/filters/impl/statistical_outlier_removal.hpp
 -
 
 /usr/include/pcl-1.8/pcl/filters/voxel_grid.h

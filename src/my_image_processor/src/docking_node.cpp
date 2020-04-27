@@ -10,6 +10,7 @@
 #include "pcl/filters/voxel_grid.h"
 #include "pcl/segmentation/sac_segmentation.h"
 #include "pcl/filters/extract_indices.h"
+#include <pcl/filters/statistical_outlier_removal.h>
 #include "pcl/filters/project_inliers.h"
 #include "pcl/surface/convex_hull.h"
 
@@ -30,6 +31,7 @@ float leaf_size = 0.1;
 int meanK = 50;
 float epsAngle = 30.0f;
 int p = 0;
+int k = 1;
 
 /** @brief The callback process the raw depth information to find the suitable docking location.
  * 
@@ -119,6 +121,13 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 		extract.setNegative(false);
 		extract.filter(*table_cloud);
 
+		// remove the outliers with statistical outlier removal filter
+        pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+        sor.setInputCloud(table_cloud);
+        sor.setMeanK(meanK);
+        sor.setStddevMulThresh(1.0);
+        sor.filter(*table_cloud);
+
 		// Check whether the candidate satisfies the following thress constrains.
 		if(fabs(coefficient->values[1]) > 0.98) 							// 1. plane is perpendicular to the ground
 		{
@@ -159,7 +168,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 						ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
 						//lineMsg.data.push_back(p.x); lineMsg.data.push_back(p.y); lineMsg.data.push_back(p.z); 	
 					}
-					// std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;
+					//std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;
 
 
 
@@ -215,6 +224,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 									{
 										cnt++;
 										grid(j, i) = 1;
+										ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);
 										break;
 									}
 								}
@@ -240,13 +250,29 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 
 
 					// std::vector<cv::Vec4i> lines;
-					// cv::HoughLinesP(cMat_8U, lines, 1, CV_PI/180, p, 0, 0);
+					// cv::HoughLinesP(cMat_8U, lines, k, CV_PI/180, p, 0, 0);
 					// std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
 					// // visualize the lines
 					// for (int i=0; i<lines.size(); ++i)
 					// {
-					// 	lineMsg.data.push_back(lines[i][0]), lineMsg.data.push_back(hull_cloud->points[1].y), lineMsg.data.push_back(lines[i][1]);
+					// 	lineMsg.data.push_back(lines[i][0]), lineMsg.data.push_back(table_cloud->points[max_z_id].y), lineMsg.data.push_back(lines[i][1]);
 					// }
+
+
+					// // method 2: try slope between any 2 points.
+					// // how to distingush between rectangel and circle
+					// std::vector<float> slopes;
+					// for (int i=0; i<hull_cloud->points.size(); ++i)
+					// {
+					// 	for (int j=i+1; j<hull_cloud->points.size(); ++j)
+					// 	{
+					// 		float m = (hull_cloud->points[j].z - hull_cloud->points[i].z) / (hull_cloud->points[j].x - hull_cloud->points[i].x);
+					// 		slopes.push_back(m);
+					// 	}
+					// }
+					// //std::cout << "the number of slopes:" << slopes.size() << std::endl;
+
+
 				}
 
 			}
@@ -312,6 +338,10 @@ int main(int argc, char **argv)
         else if((arg == "-p") || (arg == "-param"))
 		{
 			p = std::stof(argv[i+1]);
+		}
+		else if((arg == "-k") || (arg == "-kparam"))
+		{
+			k = std::stof(argv[i+1]);
 		}
 	}
 
