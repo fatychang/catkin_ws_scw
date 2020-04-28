@@ -168,21 +168,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-my_image_processor/CMakeFiles/inclide_detection_node.dir/rule:
-	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/inclide_detection_node.dir/rule
-.PHONY : my_image_processor/CMakeFiles/inclide_detection_node.dir/rule
-
-# Convenience name for target.
-inclide_detection_node: my_image_processor/CMakeFiles/inclide_detection_node.dir/rule
-
-.PHONY : inclide_detection_node
-
-# fast build rule for target.
-inclide_detection_node/fast:
-	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/build
-.PHONY : inclide_detection_node/fast
-
-# Convenience name for target.
 my_image_processor/CMakeFiles/doorway_detection_node.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
 .PHONY : my_image_processor/CMakeFiles/doorway_detection_node.dir/rule
@@ -513,6 +498,21 @@ sensor_msgs_generate_messages_eus/fast:
 .PHONY : sensor_msgs_generate_messages_eus/fast
 
 # Convenience name for target.
+my_image_processor/CMakeFiles/normal_visualization_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/normal_visualization_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/normal_visualization_node.dir/rule
+
+# Convenience name for target.
+normal_visualization_node: my_image_processor/CMakeFiles/normal_visualization_node.dir/rule
+
+.PHONY : normal_visualization_node
+
+# fast build rule for target.
+normal_visualization_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/normal_visualization_node.dir/build.make my_image_processor/CMakeFiles/normal_visualization_node.dir/build
+.PHONY : normal_visualization_node/fast
+
+# Convenience name for target.
 my_image_processor/CMakeFiles/noise_node.dir/rule:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/noise_node.dir/rule
 .PHONY : my_image_processor/CMakeFiles/noise_node.dir/rule
@@ -841,6 +841,21 @@ dynamic_reconfigure_generate_messages_cpp: my_image_processor/CMakeFiles/dynamic
 dynamic_reconfigure_generate_messages_cpp/fast:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build.make my_image_processor/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build
 .PHONY : dynamic_reconfigure_generate_messages_cpp/fast
+
+# Convenience name for target.
+my_image_processor/CMakeFiles/incline_detection_node.dir/rule:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f CMakeFiles/Makefile2 my_image_processor/CMakeFiles/incline_detection_node.dir/rule
+.PHONY : my_image_processor/CMakeFiles/incline_detection_node.dir/rule
+
+# Convenience name for target.
+incline_detection_node: my_image_processor/CMakeFiles/incline_detection_node.dir/rule
+
+.PHONY : incline_detection_node
+
+# fast build rule for target.
+incline_detection_node/fast:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/incline_detection_node.dir/build.make my_image_processor/CMakeFiles/incline_detection_node.dir/build
+.PHONY : incline_detection_node/fast
 
 # Convenience name for target.
 my_image_processor/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule:
@@ -1256,32 +1271,32 @@ src/doorway_detection_node.cpp.s:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/doorway_detection_node.dir/build.make my_image_processor/CMakeFiles/doorway_detection_node.dir/src/doorway_detection_node.cpp.s
 .PHONY : src/doorway_detection_node.cpp.s
 
-src/inclide_detection_node.o: src/inclide_detection_node.cpp.o
+src/incline_detection_node.o: src/incline_detection_node.cpp.o
 
-.PHONY : src/inclide_detection_node.o
+.PHONY : src/incline_detection_node.o
 
 # target to build an object file
-src/inclide_detection_node.cpp.o:
-	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/src/inclide_detection_node.cpp.o
-.PHONY : src/inclide_detection_node.cpp.o
+src/incline_detection_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/incline_detection_node.dir/build.make my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o
+.PHONY : src/incline_detection_node.cpp.o
 
-src/inclide_detection_node.i: src/inclide_detection_node.cpp.i
+src/incline_detection_node.i: src/incline_detection_node.cpp.i
 
-.PHONY : src/inclide_detection_node.i
+.PHONY : src/incline_detection_node.i
 
 # target to preprocess a source file
-src/inclide_detection_node.cpp.i:
-	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/src/inclide_detection_node.cpp.i
-.PHONY : src/inclide_detection_node.cpp.i
+src/incline_detection_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/incline_detection_node.dir/build.make my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.i
+.PHONY : src/incline_detection_node.cpp.i
 
-src/inclide_detection_node.s: src/inclide_detection_node.cpp.s
+src/incline_detection_node.s: src/incline_detection_node.cpp.s
 
-.PHONY : src/inclide_detection_node.s
+.PHONY : src/incline_detection_node.s
 
 # target to generate assembly for a file
-src/inclide_detection_node.cpp.s:
-	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/inclide_detection_node.dir/build.make my_image_processor/CMakeFiles/inclide_detection_node.dir/src/inclide_detection_node.cpp.s
-.PHONY : src/inclide_detection_node.cpp.s
+src/incline_detection_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/incline_detection_node.dir/build.make my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.s
+.PHONY : src/incline_detection_node.cpp.s
 
 src/lines_visualizer_node.o: src/lines_visualizer_node.cpp.o
 
@@ -1337,6 +1352,33 @@ src/noise_node.cpp.s:
 	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/noise_node.dir/build.make my_image_processor/CMakeFiles/noise_node.dir/src/noise_node.cpp.s
 .PHONY : src/noise_node.cpp.s
 
+src/normal_visualization_node.o: src/normal_visualization_node.cpp.o
+
+.PHONY : src/normal_visualization_node.o
+
+# target to build an object file
+src/normal_visualization_node.cpp.o:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/normal_visualization_node.dir/build.make my_image_processor/CMakeFiles/normal_visualization_node.dir/src/normal_visualization_node.cpp.o
+.PHONY : src/normal_visualization_node.cpp.o
+
+src/normal_visualization_node.i: src/normal_visualization_node.cpp.i
+
+.PHONY : src/normal_visualization_node.i
+
+# target to preprocess a source file
+src/normal_visualization_node.cpp.i:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/normal_visualization_node.dir/build.make my_image_processor/CMakeFiles/normal_visualization_node.dir/src/normal_visualization_node.cpp.i
+.PHONY : src/normal_visualization_node.cpp.i
+
+src/normal_visualization_node.s: src/normal_visualization_node.cpp.s
+
+.PHONY : src/normal_visualization_node.s
+
+# target to generate assembly for a file
+src/normal_visualization_node.cpp.s:
+	cd /media/js/data/WFH/Ubuntu/catkin_ws_scw/build && $(MAKE) -f my_image_processor/CMakeFiles/normal_visualization_node.dir/build.make my_image_processor/CMakeFiles/normal_visualization_node.dir/src/normal_visualization_node.cpp.s
+.PHONY : src/normal_visualization_node.cpp.s
+
 src/points_visualizer_node.o: src/points_visualizer_node.cpp.o
 
 .PHONY : src/points_visualizer_node.o
@@ -1373,7 +1415,6 @@ help:
 	@echo "... install"
 	@echo "... list_install_components"
 	@echo "... edit_cache"
-	@echo "... inclide_detection_node"
 	@echo "... doorway_detection_node"
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... install/strip"
@@ -1399,6 +1440,7 @@ help:
 	@echo "... sensor_msgs_generate_messages_nodejs"
 	@echo "... lines_visualizer_node"
 	@echo "... sensor_msgs_generate_messages_eus"
+	@echo "... normal_visualization_node"
 	@echo "... noise_node"
 	@echo "... sensor_msgs_generate_messages_cpp"
 	@echo "... actionlib_msgs_generate_messages_eus"
@@ -1422,6 +1464,7 @@ help:
 	@echo "... dynamic_reconfigure_generate_messages_py"
 	@echo "... topic_tools_generate_messages_cpp"
 	@echo "... dynamic_reconfigure_generate_messages_cpp"
+	@echo "... incline_detection_node"
 	@echo "... dynamic_reconfigure_generate_messages_eus"
 	@echo "... pcl_msgs_generate_messages_cpp"
 	@echo "... dynamic_reconfigure_generate_messages_lisp"
@@ -1452,15 +1495,18 @@ help:
 	@echo "... src/doorway_detection_node.o"
 	@echo "... src/doorway_detection_node.i"
 	@echo "... src/doorway_detection_node.s"
-	@echo "... src/inclide_detection_node.o"
-	@echo "... src/inclide_detection_node.i"
-	@echo "... src/inclide_detection_node.s"
+	@echo "... src/incline_detection_node.o"
+	@echo "... src/incline_detection_node.i"
+	@echo "... src/incline_detection_node.s"
 	@echo "... src/lines_visualizer_node.o"
 	@echo "... src/lines_visualizer_node.i"
 	@echo "... src/lines_visualizer_node.s"
 	@echo "... src/noise_node.o"
 	@echo "... src/noise_node.i"
 	@echo "... src/noise_node.s"
+	@echo "... src/normal_visualization_node.o"
+	@echo "... src/normal_visualization_node.i"
+	@echo "... src/normal_visualization_node.s"
 	@echo "... src/points_visualizer_node.o"
 	@echo "... src/points_visualizer_node.i"
 	@echo "... src/points_visualizer_node.s"

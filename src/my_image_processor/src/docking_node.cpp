@@ -48,8 +48,6 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	ptsMsg.data.clear();
 	ptsMsg2.data.clear();
 	lineMsg.data.clear();
-	// std::vector<float> pts;						//points that will be added to the messages and published
-	// pts.clear();
 
     
     // Convert the ROS message to the PCLPointCloud2

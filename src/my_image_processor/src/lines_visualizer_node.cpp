@@ -22,8 +22,9 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &lines_msg)
     marker_lineList.action = visualization_msgs::Marker::ADD;
     marker_lineList.id = 1;
     marker_lineList.type = visualization_msgs::Marker::LINE_LIST;
-    marker_lineList.scale.x = 0.03;
-    marker_lineList.pose.orientation.w =  1.0;    
+    marker_lineList.scale.x = 0.01;
+    marker_lineList.scale.y = 0.03;
+    //marker_lineList.pose.orientation.w =  1.0;    
     marker_lineList.color.a = 1.0;
     marker_lineList.color.g = 1.0;
 

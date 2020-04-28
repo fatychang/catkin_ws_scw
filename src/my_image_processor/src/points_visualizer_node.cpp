@@ -5,7 +5,7 @@
 
 ros::Publisher marker_pub, marker_pub2;
 std::vector<float> points, points2;
-float scale = 0.05f;
+float scale = 0.03f;
 
 /** @brief This callback updates the point position received from the topic.
  *  
@@ -16,7 +16,7 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
     points.clear();
 
     int numOfMsgs = point_msg ->data.size();
-    //ROS_INFO("numOfPoints: %d", numOfMsgs/3);
+    ROS_INFO("numOfPoints: %d", numOfMsgs/3);
     for (size_t i=0; i< numOfMsgs; ++i)
     {
         points.push_back(point_msg->data[i]);
@@ -30,8 +30,8 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
     marker_pts.pose.orientation.w =  1.0;
     marker_pts.id = 0;
     marker_pts.type = visualization_msgs::Marker::POINTS;
-    marker_pts.scale.x = 0.01;
-    marker_pts.scale.y = 0.01;
+    marker_pts.scale.x = 0.03;
+    marker_pts.scale.y = 0.03;
     marker_pts.color.a = 1.0;
     marker_pts.color.r = 1.0;
 

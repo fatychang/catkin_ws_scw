@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/inclide_detection_node.cpp" "/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/inclide_detection_node.dir/src/inclide_detection_node.cpp.o"
+  "/media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/incline_detection_node.cpp" "/media/js/data/WFH/Ubuntu/catkin_ws_scw/build/my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

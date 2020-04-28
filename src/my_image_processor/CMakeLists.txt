@@ -146,7 +146,8 @@ add_executable(doorway_detection_node src/doorway_detection_node.cpp)
 add_executable(points_visualizer_node src/points_visualizer_node.cpp)
 add_executable(docking_node src/docking_node.cpp)
 add_executable(lines_visualizer_node src/lines_visualizer_node.cpp)
-add_executable(inclide_detection_node src/inclide_detection_node.cpp)
+add_executable(incline_detection_node src/incline_detection_node.cpp)
+add_executable(normal_visualization_node src/normal_visualization_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -164,7 +165,11 @@ target_link_libraries(doorway_detection_node ${catkin_LIBRARIES})
 target_link_libraries(points_visualizer_node ${catkin_LIBRARIES})
 target_link_libraries(docking_node ${catkin_LIBRARIES})
 target_link_libraries(lines_visualizer_node ${catkin_LIBRARIES})
-target_link_libraries(inclide_detection_node ${catkin_LIBRARIES})
+target_link_libraries(incline_detection_node ${catkin_LIBRARIES})
+target_link_libraries(normal_visualization_node ${catkin_LIBRARIES})
+#target_link_libraries(normal_visualization_node ${PCL_LIBRARIES} libvtkCommon.so libvtkFiltering.so )
+
+
 
 
 #############
