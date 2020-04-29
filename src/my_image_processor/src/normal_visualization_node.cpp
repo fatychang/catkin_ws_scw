@@ -53,14 +53,14 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &arrow_msg)
         p.y = points[i+1];
         p.z = points[i+2];
         marker_arrow.points.push_back(p);
-        std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << std::endl;
+        // std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << std::endl;
 
         p.x = points[i+3];
         p.y = points[i+4];
         p.z = points[i+5];
         marker_arrow.points.push_back(p);
 
-        std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << "\n\n" << std::endl;
+        // std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << "\n\n" << std::endl;
    }
 
     marker_pub.publish(marker_arrow);

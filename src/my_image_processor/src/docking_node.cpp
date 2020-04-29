@@ -167,7 +167,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					{
 						pcl::PointXYZ p;
 						p.x = hull_cloud->points[i].x; p.y = hull_cloud->points[i].y; p.z = hull_cloud->points[i].z; 
-						// ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
+						ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
 						//lineMsg.data.push_back(p.x); lineMsg.data.push_back(p.y); lineMsg.data.push_back(p.z); 	
 					}
 					//std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;
@@ -208,7 +208,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 
 
 					// generate the grid
-					float step_size = 0.05;
+					float step_size = 0.01;
 					int grid_x = (max_x - min_x) / step_size, grid_z = (max_z - min_z) / step_size;	
 					// std::cout << "[DEBUG] grid_x:" << grid_x << "	grid_z:" << grid_z << std::endl;
 					Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> grid(grid_z+1, grid_x+1);
@@ -216,7 +216,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 
 					
 					int cnt = 0;
-					int edge_x = grid_x/3, edge_z = grid_z/3;
+					int edge_x = grid_x/5, edge_z = grid_z/5;
 					for(int i=0; i < grid_x + 1; ++i)
 					{					
 						for(int j=0; j < grid_z + 1; ++j)
@@ -268,19 +268,37 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 								
 								
 								float tmp_x = min_x + i * step_size, tmp_z = min_z + j * step_size;
-								if(slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z <= step_size && slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z > -step_size)
+								float tor = 1;
+								if(fabs(slope) > 500)
 								{
-									// visualize only the contour point
-									if(!grid(j, i))
+									if(tmp_x - hull_cloud->points[k].x < step_size * tor && tmp_x - hull_cloud->points[k].x > -step_size * tor )
 									{
-										cnt++;
-										grid(j, i) = 1;	
-										ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
+										// visualize only the contour point
+										if(!grid(j, i))
+										{
+											cnt++;
+											grid(j, i) = 1;	
+											ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
+										}
 									}
 								}
+								else
+								{
+									if(slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z <= step_size * tor && slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z > -step_size * tor)
+									{
+										// visualize only the contour point
+										if(!grid(j, i))
+										{
+											cnt++;
+											grid(j, i) = 1;	
+											ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
+										}
+									}
+								}
+								
 							}							
 							// grid visualization
-							//ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size); 
+							// ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size); 
 						}
 					}
 					// std::cout << "{DEBUG]: number of points detected in the grid:" << ++cnt << std::endl;
@@ -322,7 +340,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					{
 						normalsMsg.data.push_back(lines[i][0]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][1]);	// (x1, y1)
 						normalsMsg.data.push_back(lines[i][2]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][3]);	// (x2, y3)
-						std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;
+						// std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;
 					}
 
 
