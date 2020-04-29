@@ -36,7 +36,7 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &lines_msg)
     // marker_lineList.points.push_back(p);
 
 
-    // add the vertices
+    // add the vertices (for contour)
     for(int i=0; i< numOfMsgs; i+=3)
     {
         geometry_msgs::Point p;

@@ -24,7 +24,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 // Declare publisher
-ros::Publisher pub_obj, pub_filtered, pub_pts, pub_pts2, pub_line;
+ros::Publisher pub_obj, pub_filtered, pub_pts, pub_pts2, pub_line, pub_normals;
 
 // Parameters for image processing
 float leaf_size = 0.1;
@@ -32,6 +32,8 @@ int meanK = 50;
 float epsAngle = 30.0f;
 int p_param = 0;
 int k_param = 1;
+
+int tmpCnt = 0;
 
 /** @brief The callback process the raw depth information to find the suitable docking location.
  * 
@@ -44,10 +46,11 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
                                         table_cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
 	
-	std_msgs::Float32MultiArray ptsMsg, ptsMsg2, lineMsg;		//message that will be published to ROS master
+	std_msgs::Float32MultiArray ptsMsg, ptsMsg2, lineMsg, normalsMsg;		//message that will be published to ROS master
 	ptsMsg.data.clear();
 	ptsMsg2.data.clear();
 	lineMsg.data.clear();
+	normalsMsg.data.clear();
 
     
     // Convert the ROS message to the PCLPointCloud2
@@ -270,13 +273,10 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 									// visualize only the contour point
 									if(!grid(j, i))
 									{
+										cnt++;
 										grid(j, i) = 1;	
 										ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
 									}
-								}
-								else
-								{
-									grid(j, i) = 0;
 								}
 							}							
 							// grid visualization
@@ -284,27 +284,46 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 						}
 					}
 					// std::cout << "{DEBUG]: number of points detected in the grid:" << ++cnt << std::endl;
-
-					// /////////// Detect the shape: retangle or circle?
-					// // convert Eigen::Matrix to cv
-					// cv::Mat_<int> cMat = cv::Mat_<int>::ones(grid_z, grid_x);
-					// cv::eigen2cv(grid, cMat);
-					// // std::cout << "[DEBUG]: image type: " << cMat.type() << std::endl;
-					// cv::Mat cMat_8U;
-					// cMat.convertTo(cMat_8U,CV_8UC1);
-					// //std::cout << "[DEBUG]: image type: " << cMat_8U.type() << std::endl;
-
-
-					// std::vector<cv::Vec4i> lines;
-					// cv::HoughLinesP(cMat_8U, lines, k, CV_PI/180, p, 0, 0);
-					// std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
-					// // visualize the lines
-					// for (int i=0; i<lines.size(); ++i)
-					// {
-					// 	lineMsg.data.push_back(lines[i][0]), lineMsg.data.push_back(table_cloud->points[max_z_id].y), lineMsg.data.push_back(lines[i][1]);	// (x1, y1)
-					// 	lineMsg.data.push_back(lines[i][2]), lineMsg.data.push_back(table_cloud->points[max_z_id].y), lineMsg.data.push_back(lines[i][3]);	// (x2, y3)
-					// 	std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;
+					// int oneCnt = 0;
+					// for(int i=0; i < grid_x + 1; ++i)
+					// {		
+					// 	std::cout << "\n";			
+					// 	for(int j=0; j < grid_z + 1; ++j)
+					// 	{
+					// 		// if(grid(j,i)==1)
+					// 		// {
+					// 		// 	oneCnt++;
+					// 		// }
+					// 		std::cout << grid(j, i) << " ";
+					// 	}
 					// }
+					// std::cout << "number: " << oneCnt << std::endl;
+					/////////// Detect the shape: retangle or circle?
+					// convert Eigen::Matrix to cv
+					cv::Mat_<int> cMat = cv::Mat_<int>::zeros(grid_z+1, grid_x+1);
+					cv::eigen2cv(grid, cMat);
+					// std::cout << "[DEBUG]: image type: " << cMat.type() << std::endl;
+					cv::Mat cMat_8U;
+					cMat.convertTo(cMat_8U,CV_8UC1);
+					//std::cout << "[DEBUG]: image type: " << cMat_8U.type() << std::endl;
+					// if(tmpCnt == 10)
+					// {
+					// 	// cv::imwrite("test.jpg", cMat_8U);
+					// 	// cv::imshow("image", cMat_8U);
+					// 	std::cout << "image saved." << std::endl;
+					// }
+					// tmpCnt++;
+
+					std::vector<cv::Vec4i> lines;
+					cv::HoughLinesP(cMat_8U, lines, k_param, CV_PI/180, p_param, 0, 0);
+					std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
+					// visualize the lines
+					for (int i=0; i<lines.size(); ++i)
+					{
+						normalsMsg.data.push_back(lines[i][0]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][1]);	// (x1, y1)
+						normalsMsg.data.push_back(lines[i][2]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][3]);	// (x2, y3)
+						std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;
+					}
 
 
 					// // method 2: try slope between any 2 points.
@@ -342,6 +361,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	pub_pts.publish(ptsMsg);
 	pub_pts2.publish(ptsMsg2);
 	pub_line.publish(lineMsg);
+	pub_normals.publish(normalsMsg);
 }
 
 /** @brief Shows all the parse message usage.
@@ -449,11 +469,13 @@ int main(int argc, char **argv)
 	  * than we can send them, the number here specifies how many messages to
 	  * buffer up before throwing some away.
 	  */
-     pub_obj = nh.advertise<sensor_msgs::PointCloud2>("object_cloud", 1);
-     pub_filtered = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
-	 pub_pts = nh.advertise<std_msgs::Float32MultiArray>("pointInfo", 1);
-	 pub_pts2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo2", 1);
-	 pub_line = nh.advertise<std_msgs::Float32MultiArray>("lineInfo", 1);
+    pub_obj = nh.advertise<sensor_msgs::PointCloud2>("object_cloud", 1);
+    pub_filtered = nh.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 1);
+	pub_pts = nh.advertise<std_msgs::Float32MultiArray>("pointInfo", 1);
+	pub_pts2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo2", 1);
+	pub_line = nh.advertise<std_msgs::Float32MultiArray>("lineInfo", 1);
+	pub_normals = nh.advertise<std_msgs::Float32MultiArray>("normalsInfo", 1);
+
 
      ros::spin();
 

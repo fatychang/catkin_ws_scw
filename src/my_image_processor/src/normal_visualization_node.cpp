@@ -5,8 +5,8 @@
 ros::Publisher marker_pub;
 std::vector<float> points;
 
-float x_scale = 0.005;
-float y_scale = 0.005;
+float x_scale = 0.1;
+float y_scale = 0.1;
 float z_scale = 0.1;
 
 void clbk(const std_msgs::Float32MultiArray::ConstPtr &arrow_msg)
@@ -15,7 +15,7 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &arrow_msg)
     points.clear();
 
     int numOfMsgs = arrow_msg ->data.size();
-    ROS_INFO("numOfPoints: %d", numOfMsgs/6);
+    ROS_INFO("numOfMsgs: %d", numOfMsgs);
     for (size_t i=0; i< numOfMsgs; ++i)
     {
         points.push_back(arrow_msg->data[i]);
@@ -25,7 +25,7 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &arrow_msg)
     marker_arrow.header.frame_id = "/camera_link";
     marker_arrow.action = visualization_msgs::Marker::ADD;
     marker_arrow.id = 1;
-    marker_arrow.type = visualization_msgs::Marker::LINE_STRIP;
+    marker_arrow.type = visualization_msgs::Marker::LINE_LIST   ;
     marker_arrow.scale.x = x_scale;
     marker_arrow.scale.y = y_scale;
     marker_arrow.scale.z = z_scale;
@@ -38,6 +38,10 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &arrow_msg)
     // marker_arrow.points.push_back(p);
     // p.x = 1.0, p.y = 1.0, p.z = 1.0;
     // marker_arrow.points.push_back(p);
+    // p.x = 5.0, p.y = 5.0, p.z = 5.0;
+    // marker_arrow.points.push_back(p);
+    // p.x = 6.0, p.y = 6.0, p.z = 6.0;
+    // marker_arrow.points.push_back(p);
 
 
 
@@ -49,12 +53,14 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &arrow_msg)
         p.y = points[i+1];
         p.z = points[i+2];
         marker_arrow.points.push_back(p);
+        std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << std::endl;
+
         p.x = points[i+3];
         p.y = points[i+4];
         p.z = points[i+5];
         marker_arrow.points.push_back(p);
 
-        // std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << std::endl;
+        std::cout << "[DEBUG] point:" << p.x << " " << p.y << " " << p.z << "\n\n" << std::endl;
    }
 
     marker_pub.publish(marker_arrow);
