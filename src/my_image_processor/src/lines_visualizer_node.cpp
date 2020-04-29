@@ -11,7 +11,7 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &lines_msg)
     points.clear();
 
     int numOfMsgs = lines_msg ->data.size();
-    // ROS_INFO("numOfPoints: %d", numOfMsgs/3);
+    ROS_INFO("numOfPoints: %d", numOfMsgs/3);
     for (size_t i=0; i< numOfMsgs; ++i)
     {
         points.push_back(lines_msg->data[i]);
@@ -22,11 +22,19 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &lines_msg)
     marker_lineList.action = visualization_msgs::Marker::ADD;
     marker_lineList.id = 1;
     marker_lineList.type = visualization_msgs::Marker::LINE_LIST;
-    marker_lineList.scale.x = 0.01;
-    marker_lineList.scale.y = 0.03;
-    //marker_lineList.pose.orientation.w =  1.0;    
+    marker_lineList.scale.x = 0.1;
+    marker_lineList.scale.y = 0.1;
+    marker_lineList.pose.orientation.w =  1.0;    
     marker_lineList.color.a = 1.0;
     marker_lineList.color.g = 1.0;
+
+    // // debugging
+    // geometry_msgs::Point p;
+    // p.x = 1.0, p.y = 1.0, p.z = 1.0;
+    // marker_lineList.points.push_back(p);
+    // p.x = 2.0, p.y = 2.0, p.z = 2.0;
+    // marker_lineList.points.push_back(p);
+
 
     // add the vertices
     for(int i=0; i< numOfMsgs; i+=3)

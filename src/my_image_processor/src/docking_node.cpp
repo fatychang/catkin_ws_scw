@@ -30,8 +30,8 @@ ros::Publisher pub_obj, pub_filtered, pub_pts, pub_pts2, pub_line;
 float leaf_size = 0.1;
 int meanK = 50;
 float epsAngle = 30.0f;
-int p = 0;
-int k = 1;
+int p_param = 0;
+int k_param = 1;
 
 /** @brief The callback process the raw depth information to find the suitable docking location.
  * 
@@ -101,7 +101,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	seg.setDistanceThreshold(0.2);
 	seg.setInputCloud(filtered_cloud);
 	seg.segment(*inliers, *coefficient);
-	//std::cout << "[DEBUG]: coefficient: (" << coefficient->values[0] << " " << coefficient->values[1] << " " << coefficient->values[2] << std::endl;
+	// std::cout << "[DEBUG]: coefficient: (" << coefficient->values[0] << " " << coefficient->values[1] << " " << coefficient->values[2] << std::endl;
 
 	// filter the outliers
 	pcl::ExtractIndices<pcl::PointXYZ> extract;
@@ -147,7 +147,8 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 				{
 					// project the model inliers to the plane
 					pcl::ProjectInliers<pcl::PointXYZ> proj;
-					proj.setModelType(pcl::SACMODEL_NORMAL_PARALLEL_PLANE);
+					proj.setModelType(pcl::SACMODEL_PLANE);
+					proj.setIndices(inliers);
 					proj.setModelCoefficients(coefficient);
 					proj.setInputCloud(table_cloud);
 					proj.filter(*table_cloud);
@@ -163,7 +164,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					{
 						pcl::PointXYZ p;
 						p.x = hull_cloud->points[i].x; p.y = hull_cloud->points[i].y; p.z = hull_cloud->points[i].z; 
-						ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
+						// ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
 						//lineMsg.data.push_back(p.x); lineMsg.data.push_back(p.y); lineMsg.data.push_back(p.z); 	
 					}
 					//std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;
@@ -196,6 +197,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 							max_z_id = i;
 						}
 					}
+					// visualize the min/max boundaries
 					// ptsMsg2.data.push_back(table_cloud->points[min_x_id].x); ptsMsg2.data.push_back(table_cloud->points[min_x_id].y); ptsMsg2.data.push_back(table_cloud->points[min_x_id].z); 						
 					// ptsMsg2.data.push_back(table_cloud->points[max_x_id].x); ptsMsg2.data.push_back(table_cloud->points[max_x_id].y); ptsMsg2.data.push_back(table_cloud->points[max_x_id].z); 						
 					// ptsMsg2.data.push_back(table_cloud->points[min_z_id].x); ptsMsg2.data.push_back(table_cloud->points[min_z_id].y); ptsMsg2.data.push_back(table_cloud->points[min_z_id].z); 						
@@ -204,26 +206,72 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 
 					// generate the grid
 					float step_size = 0.05;
-					const int grid_x = (max_x - min_x) / step_size, grid_z = (max_z - min_z) / step_size;	
-					Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> grid(grid_z, grid_x);
+					int grid_x = (max_x - min_x) / step_size, grid_z = (max_z - min_z) / step_size;	
+					// std::cout << "[DEBUG] grid_x:" << grid_x << "	grid_z:" << grid_z << std::endl;
+					Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> grid(grid_z+1, grid_x+1);
+					grid.setZero();
 
 					
-					//std::cout << "grid_x:" << grid_x << " 	grid_z:" << grid_z << std::endl;
 					int cnt = 0;
-					for(int i=0; i< grid_x; ++i)
-					{
-						for(int j=0; j < grid_z; ++j)
+					int edge_x = grid_x/3, edge_z = grid_z/3;
+					for(int i=0; i < grid_x + 1; ++i)
+					{					
+						for(int j=0; j < grid_z + 1; ++j)
 						{
-							for (int k=0; k < hull_cloud->points.size(); ++k)
+							// if ( (i > edge_x) && (i < grid_x-edge_x))
+							if ( (i > edge_x) && (i < grid_x-edge_x) && (j > edge_z) && (j < grid_z-edge_z))
+								continue;
+
+							// for (int k=k_param; k < p_param; ++k)	//hull_cloud->points.size()
+							for (int k=0; k < hull_cloud->points.size(); ++k)	//hull_cloud->points.size()
 							{
-								if((hull_cloud->points[k].z >= min_z + j *step_size) && (hull_cloud->points[k].z < min_z + (j+1) *step_size))
+								// Mark only the convex hull points on the grid
+								// if((hull_cloud->points[k].z >= min_z + j *step_size) && (hull_cloud->points[k].z < min_z + (j+1) *step_size))
+								// {
+								// 	if((hull_cloud->points[k].x >= min_x + i *step_size) && (hull_cloud->points[k].x < min_x + (i+1) *step_size))
+								// 	{
+								// 		cnt++;
+								// 		grid(j, i) = 1;
+								// 		// visualize only the contour point
+								// 		//ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);
+								// 		break;
+								// 	}
+								// }
+
+								// Mark the contour on the grid
+								float slope;
+								if(k < hull_cloud->points.size()-1)
 								{
-									if((hull_cloud->points[k].x >= min_x + i *step_size) && (hull_cloud->points[k].x < min_x + (i+1) *step_size))
+									slope = (hull_cloud->points[k+1].z - hull_cloud->points[k].z)/(hull_cloud->points[k+1].x - hull_cloud->points[k].x);
+									//visualize the convux hull
+									// ptsMsg2.data.push_back(hull_cloud->points[k].x), ptsMsg2.data.push_back(hull_cloud->points[k].y), ptsMsg2.data.push_back(hull_cloud->points[k].z);
+									// ptsMsg2.data.push_back(hull_cloud->points[k+1].x), ptsMsg2.data.push_back(hull_cloud->points[k+1].y), ptsMsg2.data.push_back(hull_cloud->points[k+1].z);
+									// std::cout << "hull point " << k << " (" << hull_cloud->points[k].x << "," << hull_cloud->points[k].z << std::endl;
+									// std::cout << "hull point " << k+1 << " (" << hull_cloud->points[k+1].x << "," << hull_cloud->points[k+1].z << std::endl;
+									// std::cout << "[DEBUG]: slope for point " << k << " : " << slope << std::endl;
+								}
+								else
+								{
+									slope = (hull_cloud->points[0].z - hull_cloud->points[k].z)/(hull_cloud->points[0].x - hull_cloud->points[k].x);
+									//visualize the convux hull
+									// ptsMsg2.data.push_back(hull_cloud->points[k].x), ptsMsg2.data.push_back(hull_cloud->points[k].y), ptsMsg2.data.push_back(hull_cloud->points[k].z);
+									// ptsMsg2.data.push_back(hull_cloud->points[0].x), ptsMsg2.data.push_back(hull_cloud->points[0].y), ptsMsg2.data.push_back(hull_cloud->points[0].z);
+									// std::cout << "hull point " << k << " (" << hull_cloud->points[k].x << "," << hull_cloud->points[k].z << std::endl;
+									// std::cout << "hull point 0 (" << hull_cloud->points[0].x << "," << hull_cloud->points[0].z << std::endl;
+									// std::cout << "[DEBUG]: slope for point " << k << " : " << slope << std::endl;
+								}
+
+								
+								
+								
+								float tmp_x = min_x + i * step_size, tmp_z = min_z + j * step_size;
+								if(slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z <= step_size && slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z > -step_size)
+								{
+									// visualize only the contour point
+									if(!grid(j, i))
 									{
-										cnt++;
-										grid(j, i) = 1;
-										ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);
-										break;
+										grid(j, i) = 1;	
+										ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
 									}
 								}
 								else
@@ -253,7 +301,9 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					// // visualize the lines
 					// for (int i=0; i<lines.size(); ++i)
 					// {
-					// 	lineMsg.data.push_back(lines[i][0]), lineMsg.data.push_back(table_cloud->points[max_z_id].y), lineMsg.data.push_back(lines[i][1]);
+					// 	lineMsg.data.push_back(lines[i][0]), lineMsg.data.push_back(table_cloud->points[max_z_id].y), lineMsg.data.push_back(lines[i][1]);	// (x1, y1)
+					// 	lineMsg.data.push_back(lines[i][2]), lineMsg.data.push_back(table_cloud->points[max_z_id].y), lineMsg.data.push_back(lines[i][3]);	// (x2, y3)
+					// 	std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;
 					// }
 
 
@@ -335,11 +385,11 @@ int main(int argc, char **argv)
 		}
         else if((arg == "-p") || (arg == "-param"))
 		{
-			p = std::stof(argv[i+1]);
+			p_param = std::stof(argv[i+1]);
 		}
 		else if((arg == "-k") || (arg == "-kparam"))
 		{
-			k = std::stof(argv[i+1]);
+			k_param = std::stof(argv[i+1]);
 		}
 	}
 
@@ -377,7 +427,9 @@ int main(int argc, char **argv)
 	 * is the number of messages that will be buffered up before beginning to throw
 	 * away the oldest ones.
 	 */
-    ros::Subscriber sub = nh.subscribe("depth_noise", 1, dockingCallback);    
+    // ros::Subscriber sub = nh.subscribe("depth_noise", 1, dockingCallback);  
+    ros::Subscriber sub = nh.subscribe("/camera/depth/points", 1, dockingCallback);
+
 
 
 	 /**
