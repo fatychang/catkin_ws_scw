@@ -33,7 +33,71 @@ float epsAngle = 30.0f;
 int p_param = 0;
 int k_param = 1;
 
-int tmpCnt = 0;
+/** @brief calculate the minimum or maxmimun of the given point cloud and return the index
+ * 
+ * @param cloud_points the points required to be sorted
+ * @param mode find minimum =0; find maximum =1
+ * @param axis the axis to be sorted
+ * 
+ * @return the index of the min/max point is returned
+ */
+int calculateMinMax(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int mode, char axis)
+{
+	float required_value=-1;
+	int returned_index=0;
+	float point=-1;
+
+
+	if(axis == 'x')
+		required_value =cloud->points[0].x;
+	else if (axis == 'y')
+		required_value = cloud->points[0].y;
+	else if (axis == 'z')
+		required_value = cloud->points[0].z;
+	else
+	{
+		ROS_ERROR("Please provide a valid axis. (x, y, or z) with small letters");
+		return -1;
+	}
+
+	if(mode > 2)
+	{
+		ROS_ERROR("Please provide a valid mode. 0=min, 1=max");
+		return -1;
+	}
+	
+	for(int i=1; i<cloud->points.size(); ++i)
+	{
+		if(axis == 'x')
+			point =cloud->points[i].x;
+		else if (axis == 'y')
+			point = cloud->points[i].y;
+		else if (axis == 'z')
+			point = cloud->points[i].z;
+
+		// compare
+		if(mode == 0)	//min
+		{
+			if(point < required_value)
+			{
+				required_value = point;
+				returned_index = i;
+			}
+		}
+		else			//max
+		{
+			if(point > required_value)
+			{
+				required_value = point;
+				returned_index = i;
+			}
+		}		
+	}
+
+	return returned_index;
+}
+
+
 
 /** @brief Calculate the intersection of two lines.
  * 
@@ -60,17 +124,11 @@ Eigen::Vector2f calculateIntersection(Eigen::Vector2f pt1, Eigen::Vector2f pt2, 
 	float determinant = a1*b2 - a2*b1;
 
 	if (determinant == 0)
-	{
-		// the lines are parallel
 		intersect << NAN, NAN;
-	}
 	else
-	{
 		intersect << (b2*c1 - b1*c2)/determinant, (a1*c2 - a2*c1)/determinant;
-	}
+
 	return intersect;
-
-
 }
 
 /** @brief The callback process the raw depth information to find the suitable docking location.
@@ -201,6 +259,14 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					hull.reconstruct(*hull_cloud);
 
 					// update points to the message for visualization - hull_could point
+					if (hull_cloud->points.size() == 0)
+					{
+
+					}
+					else
+					{
+
+					}
 					for(int i=0; i<hull_cloud->points.size(); ++i)
 					{
 						pcl::PointXYZ p;
@@ -213,31 +279,15 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 
 
 					// find the min & max in the x and z direction
-					float min_x = table_cloud->points[0].x, min_z = table_cloud->points[0].z, max_x = table_cloud->points[0].x, max_z = table_cloud->points[0].z;
-					int min_x_id = 0, min_z_id = 0, max_x_id = 0, max_z_id = 0;
-					for (int i=1; i<table_cloud->points.size(); ++i)
-					{
-						if(table_cloud->points[i].x < min_x)
-						{
-							min_x = table_cloud->points[i].x;
-							min_x_id = i;
-						}
-						if(table_cloud->points[i].x > max_x)
-						{
-							max_x = table_cloud->points[i].x;
-							max_x_id = i;
-						}
-						if(table_cloud->points[i].z < min_z)
-						{
-							min_z = table_cloud->points[i].z;
-							min_z_id = i;
-						}
-						if(table_cloud->points[i].z > max_z)
-						{
-							max_z = table_cloud->points[i].z;
-							max_z_id = i;
-						}
-					}
+					int min_x_id = calculateMinMax(table_cloud, 0, 'x');
+					int max_x_id = calculateMinMax(table_cloud, 1, 'x');
+					int min_z_id = calculateMinMax(table_cloud, 0, 'z');
+					int max_z_id = calculateMinMax(table_cloud, 1, 'z');
+					float min_x = table_cloud->points[min_x_id].x;
+					float max_x = table_cloud->points[max_x_id].x;
+					float min_z = table_cloud->points[min_z_id].z;
+					float max_z = table_cloud->points[max_z_id].z;					
+
 					// visualize the min/max boundaries
 					// ptsMsg2.data.push_back(table_cloud->points[min_x_id].x); ptsMsg2.data.push_back(table_cloud->points[min_x_id].y); ptsMsg2.data.push_back(table_cloud->points[min_x_id].z); 						
 					// ptsMsg2.data.push_back(table_cloud->points[max_x_id].x); ptsMsg2.data.push_back(table_cloud->points[max_x_id].y); ptsMsg2.data.push_back(table_cloud->points[max_x_id].z); 						
