@@ -5,9 +5,9 @@
 ros::Publisher marker_pub;
 std::vector<float> points;
 
-float x_scale = 0.1;
-float y_scale = 0.1;
-float z_scale = 0.1;
+float x_scale = 0.01;
+float y_scale = 0.01;
+float z_scale = 0.01;
 
 void clbk(const std_msgs::Float32MultiArray::ConstPtr &arrow_msg)
 {

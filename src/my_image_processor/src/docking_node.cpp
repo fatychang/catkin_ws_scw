@@ -316,46 +316,39 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					// 	}
 					// }
 					// std::cout << "number: " << oneCnt << std::endl;
-					/////////// Detect the shape: retangle or circle?
+
+
+					/////////// Detect the shape: retangle or circle 
 					// convert Eigen::Matrix to cv
 					cv::Mat_<int> cMat = cv::Mat_<int>::zeros(grid_z+1, grid_x+1);
 					cv::eigen2cv(grid, cMat);
 					// std::cout << "[DEBUG]: image type: " << cMat.type() << std::endl;
 					cv::Mat cMat_8U;
 					cMat.convertTo(cMat_8U,CV_8UC1);
-					//std::cout << "[DEBUG]: image type: " << cMat_8U.type() << std::endl;
-					// if(tmpCnt == 10)
-					// {
-					// 	// cv::imwrite("test.jpg", cMat_8U);
-					// 	// cv::imshow("image", cMat_8U);
-					// 	std::cout << "image saved." << std::endl;
-					// }
-					// tmpCnt++;
+
 
 					std::vector<cv::Vec4i> lines;
-					cv::HoughLinesP(cMat_8U, lines, k_param, CV_PI/180, p_param, 0, 0);
+					cv::HoughLinesP(cMat_8U, lines, 1, CV_PI/180, 60, 0, 0);
 					std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
 					// visualize the lines
 					for (int i=0; i<lines.size(); ++i)
 					{
-						normalsMsg.data.push_back(lines[i][0]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][1]);	// (x1, y1)
-						normalsMsg.data.push_back(lines[i][2]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][3]);	// (x2, y3)
-						// std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;
+						float x1 = min_x + lines[i][0] * step_size, z1 = min_z + lines[i][1] * step_size;
+						float x2 = min_x + lines[i][2] * step_size, z2 = min_z + lines[i][3] * step_size;
+						// normalsMsg.data.push_back(lines[i][0]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][1]);	// (x1, y1)
+						// normalsMsg.data.push_back(lines[i][2]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][3]);	// (x2, y3)
+						normalsMsg.data.push_back(x1), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(z1);	// (x1, z1)
+						normalsMsg.data.push_back(x2), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(z2);	// (x2, z2)
+						
+						std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;
 					}
 
+					/////////// corner and edge detection
+					// calculate the intersect of the lines
+					for (int i=0; i < lines.size(); ++i)
+					{
 
-					// // method 2: try slope between any 2 points.
-					// // how to distingush between rectangel and circle
-					// std::vector<float> slopes;
-					// for (int i=0; i<hull_cloud->points.size(); ++i)
-					// {
-					// 	for (int j=i+1; j<hull_cloud->points.size(); ++j)
-					// 	{
-					// 		float m = (hull_cloud->points[j].z - hull_cloud->points[i].z) / (hull_cloud->points[j].x - hull_cloud->points[i].x);
-					// 		slopes.push_back(m);
-					// 	}
-					// }
-					// //std::cout << "the number of slopes:" << slopes.size() << std::endl;
+					}
 
 
 				}
