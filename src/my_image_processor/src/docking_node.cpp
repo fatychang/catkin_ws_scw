@@ -206,7 +206,7 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	pcl::ExtractIndices<pcl::PointXYZ> extract;
 	if(inliers->indices.size() == 0)
 	{
-		ROS_INFO("Table not found. Keep searching...");
+		ROS_INFO("Table not found. Keep searching...");		
 	}
 	else
 	{
@@ -226,292 +226,254 @@ void dockingCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
         sor.filter(*table_cloud);
 
 		// Check whether the candidate satisfies the following thress constrains.
-		if(fabs(coefficient->values[1]) > 0.98) 							// 1. plane is perpendicular to the ground
+		// 1. plane is perpendicular to the ground
+		// 2. the number of points exceed a certain threshold
+		// 3. the height of the table exceeds the threshold
+		float perpendicular = 0.98;
+		int minimul_num_of_points = 100;
+		float camera_height = 1.3;
+		float minimul_table_height = 0.7112;  //around 28'
+
+		// calculate the average height (y) of all the points in the plane
+		float avgTableHeight = 0.0;
+		for (int i=0; i< table_cloud->points.size(); ++i)
 		{
-			int minimul_num_of_points = 100;
-			if(table_cloud->points.size() > minimul_num_of_points)			// 2. the number of points exceed a certain threshold
+			avgTableHeight+=table_cloud->points[i].y;
+		}
+		avgTableHeight /= table_cloud->points.size();
+
+		if((fabs(coefficient->values[1]) > perpendicular) && (table_cloud->points.size() > minimul_num_of_points) && (avgTableHeight < camera_height - minimul_table_height))
+		{
+			std::cout << "[DEBUG] Table candidate found." << std::endl;
+
+			// project the model inliers to the plane
+			pcl::ProjectInliers<pcl::PointXYZ> proj;
+			proj.setModelType(pcl::SACMODEL_PLANE);
+			proj.setIndices(inliers);
+			proj.setModelCoefficients(coefficient);
+			proj.setInputCloud(table_cloud);
+			proj.filter(*table_cloud);
+
+			// create a Convex Hull representation
+			pcl::PointCloud<pcl::PointXYZ>::Ptr hull_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+			pcl::ConvexHull<pcl::PointXYZ> hull;
+			hull.setInputCloud(table_cloud);
+			hull.reconstruct(*hull_cloud);
+
+			if(hull_cloud->points.size() > 0)
 			{
-				// calculate the average height (y) of all the points in the plane
-				float avgTableHeight = 0.0;
-				for (int i=0; i< table_cloud->points.size(); ++i)
-				{
-					avgTableHeight+=table_cloud->points[i].y;
-				}
-				avgTableHeight /= table_cloud->points.size();
-				// std::cout << "[DEBUG]: avg height: " << avgTableHeight << std::endl;
+				// // visualize the convex hull (contour and points)
+				// for(int i=0; i<hull_cloud->points.size(); ++i)
+				// {
+				// 	ptsMsg2.data.push_back(hull_cloud->points[i].x); ptsMsg2.data.push_back(hull_cloud->points[i].y); ptsMsg2.data.push_back(hull_cloud->points[i].z); 						
+				// 	lineMsg.data.push_back(hull_cloud->points[i].x); lineMsg.data.push_back(hull_cloud->points[i].y); lineMsg.data.push_back(hull_cloud->points[i].); 	
+				// }
+				// //std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;\
 
-				float camera_height = 1.3;
-				float minimul_table_height = 0.7112;  //around 28'
-				if(avgTableHeight < camera_height - minimul_table_height)	// 3. the height of the table exceeds the threshold
-				{
-					// project the model inliers to the plane
-					pcl::ProjectInliers<pcl::PointXYZ> proj;
-					proj.setModelType(pcl::SACMODEL_PLANE);
-					proj.setIndices(inliers);
-					proj.setModelCoefficients(coefficient);
-					proj.setInputCloud(table_cloud);
-					proj.filter(*table_cloud);
-
-					// create a Convex Hull representation
-					pcl::PointCloud<pcl::PointXYZ>::Ptr hull_cloud (new pcl::PointCloud<pcl::PointXYZ>);
-					pcl::ConvexHull<pcl::PointXYZ> hull;
-					hull.setInputCloud(table_cloud);
-					hull.reconstruct(*hull_cloud);
-
-					// update points to the message for visualization - hull_could point
-					if (hull_cloud->points.size() == 0)
-					{
-
-					}
-					else
-					{
-
-					}
-					for(int i=0; i<hull_cloud->points.size(); ++i)
-					{
-						pcl::PointXYZ p;
-						p.x = hull_cloud->points[i].x; p.y = hull_cloud->points[i].y; p.z = hull_cloud->points[i].z; 
-						//ptsMsg2.data.push_back(p.x); ptsMsg2.data.push_back(p.y); ptsMsg2.data.push_back(p.z); 						
-						//lineMsg.data.push_back(p.x); lineMsg.data.push_back(p.y); lineMsg.data.push_back(p.z); 	
-					}
-					//std::cout << "[DEBUG]: the number of points in the hull: " << hull_cloud->points.size() << std::endl;
+				// find the min & max in the x and z direction 
+				int min_x_id = calculateMinMax(table_cloud, 0, 'x');
+				int max_x_id = calculateMinMax(table_cloud, 1, 'x');
+				int min_z_id = calculateMinMax(table_cloud, 0, 'z');
+				int max_z_id = calculateMinMax(table_cloud, 1, 'z');
+				float min_x = table_cloud->points[min_x_id].x;
+				float max_x = table_cloud->points[max_x_id].x;
+				float min_z = table_cloud->points[min_z_id].z;
+				float max_z = table_cloud->points[max_z_id].z;
+				// visualize the min/max boundaries
+				// ptsMsg2.data.push_back(table_cloud->points[min_x_id].x); ptsMsg2.data.push_back(table_cloud->points[min_x_id].y); ptsMsg2.data.push_back(table_cloud->points[min_x_id].z); 						
+				// ptsMsg2.data.push_back(table_cloud->points[max_x_id].x); ptsMsg2.data.push_back(table_cloud->points[max_x_id].y); ptsMsg2.data.push_back(table_cloud->points[max_x_id].z); 						
+				// ptsMsg2.data.push_back(table_cloud->points[min_z_id].x); ptsMsg2.data.push_back(table_cloud->points[min_z_id].y); ptsMsg2.data.push_back(table_cloud->points[min_z_id].z); 						
+				// ptsMsg2.data.push_back(table_cloud->points[max_z_id].x); ptsMsg2.data.push_back(table_cloud->points[max_z_id].y); ptsMsg2.data.push_back(table_cloud->points[max_z_id].z); 
 
 
+				// generate the grid
+				float step_size = 0.01;
+				int grid_x = (max_x - min_x) / step_size, grid_z = (max_z - min_z) / step_size;	
+				// std::cout << "[DEBUG] grid_x:" << grid_x << "	grid_z:" << grid_z << std::endl;
+				Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> grid(grid_z+1, grid_x+1);
+				grid.setZero();
 
-					// find the min & max in the x and z direction
-					int min_x_id = calculateMinMax(table_cloud, 0, 'x');
-					int max_x_id = calculateMinMax(table_cloud, 1, 'x');
-					int min_z_id = calculateMinMax(table_cloud, 0, 'z');
-					int max_z_id = calculateMinMax(table_cloud, 1, 'z');
-					float min_x = table_cloud->points[min_x_id].x;
-					float max_x = table_cloud->points[max_x_id].x;
-					float min_z = table_cloud->points[min_z_id].z;
-					float max_z = table_cloud->points[max_z_id].z;					
+				int edge_x = grid_x/5, edge_z = grid_z/5;
+				for(int i=0; i < grid_x + 1; ++i)
+				{					
+					for(int j=0; j < grid_z + 1; ++j)
+					{	
+						// sort only points that are close to the boundary
+						if ( (i > edge_x) && (i < grid_x-edge_x) && (j > edge_z) && (j < grid_z-edge_z))
+							continue;
 
-					// visualize the min/max boundaries
-					// ptsMsg2.data.push_back(table_cloud->points[min_x_id].x); ptsMsg2.data.push_back(table_cloud->points[min_x_id].y); ptsMsg2.data.push_back(table_cloud->points[min_x_id].z); 						
-					// ptsMsg2.data.push_back(table_cloud->points[max_x_id].x); ptsMsg2.data.push_back(table_cloud->points[max_x_id].y); ptsMsg2.data.push_back(table_cloud->points[max_x_id].z); 						
-					// ptsMsg2.data.push_back(table_cloud->points[min_z_id].x); ptsMsg2.data.push_back(table_cloud->points[min_z_id].y); ptsMsg2.data.push_back(table_cloud->points[min_z_id].z); 						
-					// ptsMsg2.data.push_back(table_cloud->points[max_z_id].x); ptsMsg2.data.push_back(table_cloud->points[max_z_id].y); ptsMsg2.data.push_back(table_cloud->points[max_z_id].z); 
-
-
-					// generate the grid
-					float step_size = 0.01;
-					int grid_x = (max_x - min_x) / step_size, grid_z = (max_z - min_z) / step_size;	
-					// std::cout << "[DEBUG] grid_x:" << grid_x << "	grid_z:" << grid_z << std::endl;
-					Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> grid(grid_z+1, grid_x+1);
-					grid.setZero();
-
-					
-					int cnt = 0;
-					int edge_x = grid_x/5, edge_z = grid_z/5;
-					for(int i=0; i < grid_x + 1; ++i)
-					{					
-						for(int j=0; j < grid_z + 1; ++j)
+						for (int k=0; k < hull_cloud->points.size(); ++k)	
 						{
-							// if ( (i > edge_x) && (i < grid_x-edge_x))
-							if ( (i > edge_x) && (i < grid_x-edge_x) && (j > edge_z) && (j < grid_z-edge_z))
-								continue;
+							// Mark only the convex hull points on the grid
+							// if((hull_cloud->points[k].z >= min_z + j *step_size) && (hull_cloud->points[k].z < min_z + (j+1) *step_size))
+							// {
+							// 	if((hull_cloud->points[k].x >= min_x + i *step_size) && (hull_cloud->points[k].x < min_x + (i+1) *step_size))
+							// 	{
+							// 		grid(j, i) = 1;
+							// 		// visualize only the contour point
+							// 		//ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);
+							// 		break;
+							// 	}
+							// }
 
-							// for (int k=k_param; k < p_param; ++k)	//hull_cloud->points.size()
-							for (int k=0; k < hull_cloud->points.size(); ++k)	//hull_cloud->points.size()
+							///// Mark the contour on the grid
+							// calculate the slope
+							float slope;
+							if(k < hull_cloud->points.size()-1)
 							{
-								// Mark only the convex hull points on the grid
-								// if((hull_cloud->points[k].z >= min_z + j *step_size) && (hull_cloud->points[k].z < min_z + (j+1) *step_size))
-								// {
-								// 	if((hull_cloud->points[k].x >= min_x + i *step_size) && (hull_cloud->points[k].x < min_x + (i+1) *step_size))
-								// 	{
-								// 		cnt++;
-								// 		grid(j, i) = 1;
-								// 		// visualize only the contour point
-								// 		//ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);
-								// 		break;
-								// 	}
-								// }
-
-								// Mark the contour on the grid
-								float slope;
-								if(k < hull_cloud->points.size()-1)
+								slope = (hull_cloud->points[k+1].z - hull_cloud->points[k].z)/(hull_cloud->points[k+1].x - hull_cloud->points[k].x);
+								// visualize the convux hull
+								// ptsMsg2.data.push_back(hull_cloud->points[k].x), ptsMsg2.data.push_back(hull_cloud->points[k].y), ptsMsg2.data.push_back(hull_cloud->points[k].z);
+								// ptsMsg2.data.push_back(hull_cloud->points[k+1].x), ptsMsg2.data.push_back(hull_cloud->points[k+1].y), ptsMsg2.data.push_back(hull_cloud->points[k+1].z);
+								// std::cout << "hull point " << k << " (" << hull_cloud->points[k].x << "," << hull_cloud->points[k].z << std::endl;
+								// std::cout << "hull point " << k+1 << " (" << hull_cloud->points[k+1].x << "," << hull_cloud->points[k+1].z << std::endl;
+								// std::cout << "[DEBUG]: slope for point " << k << " : " << slope << std::endl;
+							}
+							else
+							{
+								slope = (hull_cloud->points[0].z - hull_cloud->points[k].z)/(hull_cloud->points[0].x - hull_cloud->points[k].x);
+								//visualize the convux hull
+								// ptsMsg2.data.push_back(hull_cloud->points[k].x), ptsMsg2.data.push_back(hull_cloud->points[k].y), ptsMsg2.data.push_back(hull_cloud->points[k].z);
+								// ptsMsg2.data.push_back(hull_cloud->points[0].x), ptsMsg2.data.push_back(hull_cloud->points[0].y), ptsMsg2.data.push_back(hull_cloud->points[0].z);
+								// std::cout << "hull point " << k << " (" << hull_cloud->points[k].x << "," << hull_cloud->points[k].z << std::endl;
+								// std::cout << "hull point 0 (" << hull_cloud->points[0].x << "," << hull_cloud->points[0].z << std::endl;
+								// std::cout << "[DEBUG]: slope for point " << k << " : " << slope << std::endl;
+							}	
+							
+							
+							float tmp_x = min_x + i * step_size, tmp_z = min_z + j * step_size;
+							float tor = 1;
+							if(fabs(slope) > 500)
+							{
+								if(tmp_x - hull_cloud->points[k].x < step_size * tor && tmp_x - hull_cloud->points[k].x > -step_size * tor )
 								{
-									slope = (hull_cloud->points[k+1].z - hull_cloud->points[k].z)/(hull_cloud->points[k+1].x - hull_cloud->points[k].x);
-									//visualize the convux hull
-									// ptsMsg2.data.push_back(hull_cloud->points[k].x), ptsMsg2.data.push_back(hull_cloud->points[k].y), ptsMsg2.data.push_back(hull_cloud->points[k].z);
-									// ptsMsg2.data.push_back(hull_cloud->points[k+1].x), ptsMsg2.data.push_back(hull_cloud->points[k+1].y), ptsMsg2.data.push_back(hull_cloud->points[k+1].z);
-									// std::cout << "hull point " << k << " (" << hull_cloud->points[k].x << "," << hull_cloud->points[k].z << std::endl;
-									// std::cout << "hull point " << k+1 << " (" << hull_cloud->points[k+1].x << "," << hull_cloud->points[k+1].z << std::endl;
-									// std::cout << "[DEBUG]: slope for point " << k << " : " << slope << std::endl;
-								}
-								else
-								{
-									slope = (hull_cloud->points[0].z - hull_cloud->points[k].z)/(hull_cloud->points[0].x - hull_cloud->points[k].x);
-									//visualize the convux hull
-									// ptsMsg2.data.push_back(hull_cloud->points[k].x), ptsMsg2.data.push_back(hull_cloud->points[k].y), ptsMsg2.data.push_back(hull_cloud->points[k].z);
-									// ptsMsg2.data.push_back(hull_cloud->points[0].x), ptsMsg2.data.push_back(hull_cloud->points[0].y), ptsMsg2.data.push_back(hull_cloud->points[0].z);
-									// std::cout << "hull point " << k << " (" << hull_cloud->points[k].x << "," << hull_cloud->points[k].z << std::endl;
-									// std::cout << "hull point 0 (" << hull_cloud->points[0].x << "," << hull_cloud->points[0].z << std::endl;
-									// std::cout << "[DEBUG]: slope for point " << k << " : " << slope << std::endl;
-								}
-
-								
-								
-								
-								float tmp_x = min_x + i * step_size, tmp_z = min_z + j * step_size;
-								float tor = 1;
-								if(fabs(slope) > 500)
-								{
-									if(tmp_x - hull_cloud->points[k].x < step_size * tor && tmp_x - hull_cloud->points[k].x > -step_size * tor )
+									// visualize only the contour points
+									if(!grid(j, i))
 									{
-										// visualize only the contour point
-										if(!grid(j, i))
-										{
-											cnt++;
-											grid(j, i) = 1;	
-											//ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
-										}
+										grid(j, i) = 1;	
+										//ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
 									}
 								}
-								else
+							}
+							else
+							{
+								if(slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z <= step_size * tor && slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z > -step_size * tor)
 								{
-									if(slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z <= step_size * tor && slope * (tmp_x - hull_cloud->points[k].x) - tmp_z + hull_cloud->points[k].z > -step_size * tor)
+									// visualize only the contour points
+									if(!grid(j, i))
 									{
-										// visualize only the contour point
-										if(!grid(j, i))
-										{
-											cnt++;
-											grid(j, i) = 1;	
-											// ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
-										}
+										grid(j, i) = 1;	
+										// ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size);								
 									}
 								}
-								
 							}							
-							// grid visualization
-							// ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size); 
-						}
+						}							
+						// grid visualization
+						// ptsMsg.data.push_back(min_x + i*step_size); ptsMsg.data.push_back(table_cloud->points[max_z_id].y); ptsMsg.data.push_back(min_z + j * step_size); 
 					}
-					// std::cout << "{DEBUG]: number of points detected in the grid:" << ++cnt << std::endl;
-					// int oneCnt = 0;
-					// for(int i=0; i < grid_x + 1; ++i)
-					// {		
-					// 	std::cout << "\n";			
-					// 	for(int j=0; j < grid_z + 1; ++j)
-					// 	{
-					// 		// if(grid(j,i)==1)
-					// 		// {
-					// 		// 	oneCnt++;
-					// 		// }
-					// 		std::cout << grid(j, i) << " ";
-					// 	}
-					// }
-					// std::cout << "number: " << oneCnt << std::endl;
+				}	// end of generating the grid
 
+				/////////// Detect the shape: retangle or circle 
+				// convert Eigen::Matrix to cv
+				cv::Mat_<int> cMat = cv::Mat_<int>::zeros(grid_z+1, grid_x+1);
+				cv::eigen2cv(grid, cMat);
+				cv::Mat cMat_8U;
+				cMat.convertTo(cMat_8U,CV_8UC1);
+				
+				// Hough transfer to detect lines
+				std::vector<cv::Vec4i> lines;
+				cv::HoughLinesP(cMat_8U, lines, 1, CV_PI/180, 60, 0, 0);
+				// std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
+				// Visualize the lines and print it
+				for (int i=0; i<lines.size(); ++i)
+				{
+					float x1 = min_x + lines[i][0] * step_size, z1 = min_z + lines[i][1] * step_size;
+					float x2 = min_x + lines[i][2] * step_size, z2 = min_z + lines[i][3] * step_size;
+					normalsMsg.data.push_back(x1), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(z1);	// (x1, z1)
+					normalsMsg.data.push_back(x2), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(z2);	// (x2, z2)					
+					// std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;																													
+				}
 
-					/////////// Detect the shape: retangle or circle 
-					// convert Eigen::Matrix to cv
-					cv::Mat_<int> cMat = cv::Mat_<int>::zeros(grid_z+1, grid_x+1);
-					cv::eigen2cv(grid, cMat);
-					// std::cout << "[DEBUG]: image type: " << cMat.type() << std::endl;
-					cv::Mat cMat_8U;
-					cMat.convertTo(cMat_8U,CV_8UC1);
+				// calculate the intersect
+				std::vector<Eigen::Vector2f> intersects;
+				for (int i=0; i<lines.size(); ++i)
+				{
+					Eigen::Vector2f pt1, pt2, pt3, pt4;
 
-
-					std::vector<cv::Vec4i> lines;
-					cv::HoughLinesP(cMat_8U, lines, 1, CV_PI/180, 60, 0, 0);
-					std::cout << "[DEBUG]: the number of lines detected:" << lines.size() << std::endl;
-					// Visualize the lines
-					std::vector<float> line_slopes;
-					for (int i=0; i<lines.size(); ++i)
+					pt1 << min_x + lines[i][0] * step_size, min_z + lines[i][1] * step_size;
+					pt2 << min_x + lines[i][2] * step_size, min_z + lines[i][3] * step_size;
+					for (int j=i+1; j<lines.size(); ++j)
 					{
-						float x1 = min_x + lines[i][0] * step_size, z1 = min_z + lines[i][1] * step_size;
-						float x2 = min_x + lines[i][2] * step_size, z2 = min_z + lines[i][3] * step_size;
-
-						// Visualize with normal_visualization_node
-						// normalsMsg.data.push_back(lines[i][0]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][1]);	// (x1, y1)
-						// normalsMsg.data.push_back(lines[i][2]), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(lines[i][3]);	// (x2, y3)
-						normalsMsg.data.push_back(x1), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(z1);	// (x1, z1)
-						normalsMsg.data.push_back(x2), normalsMsg.data.push_back(table_cloud->points[max_z_id].y), normalsMsg.data.push_back(z2);	// (x2, z2)
-						
-						std::cout << "line " << i << ":(" << lines[i][0] << "," << lines[i][1] << ")	" << "(" << lines[i][2] << "," << lines[i][3] << ")" << std::endl;												
-																		
+						pt3 << min_x + lines[j][0] * step_size, min_z + lines[j][1] * step_size;
+						pt4 << min_x + lines[j][2] * step_size, min_z + lines[j][3] * step_size;
+						intersects.push_back(calculateIntersection(pt1, pt2, pt3, pt4));
 					}
+				}
+				// std::cout << "The number of intersects: " << intersects.size() << std::endl;
+				// for (int i=0; i<intersects.size(); ++i)
+				// {
+				// 	std::cout << "Intersected " << i << ":(" << intersects[i][0] << "," << intersects[i][1] << std::endl;
+				// }
 
-					// calculate the intersect
-					std::vector<Eigen::Vector2f> intersects;
-					for (int i=0; i<lines.size(); ++i)
+
+				// Extract the corners from the intersected points
+				std::vector<Eigen::Vector3f> corners;
+				for (int i=0; i< intersects.size(); ++i)
+				{
+					if(!isnan(intersects[i](0)) || !isnan(intersects[i](1)))
 					{
-						Eigen::Vector2f pt1, pt2, pt3, pt4;
+						// // Visualize valid intersected points
+						// ptsMsg.data.push_back(intersects[i](0)), ptsMsg.data.push_back(table_cloud->points[max_z_id].y), ptsMsg.data.push_back(intersects[i](1));									
 
-						pt1 << min_x + lines[i][0] * step_size, min_z + lines[i][1] * step_size;
-						pt2 << min_x + lines[i][2] * step_size, min_z + lines[i][3] * step_size;
-						for (int j=i+1; j<lines.size(); ++j)
+						if(intersects[i](0) >= max_x-step_size && intersects[i](0) <= max_x+step_size || intersects[i](0) <= min_x + step_size && intersects[i](0) >= min_x - step_size)
 						{
-							pt3 << min_x + lines[j][0] * step_size, min_z + lines[j][1] * step_size;
-							pt4 << min_x + lines[j][2] * step_size, min_z + lines[j][3] * step_size;
-							intersects.push_back(calculateIntersection(pt1, pt2, pt3, pt4));
-						}
-					}
-					std::cout << "The number of intersects: " << intersects.size() << std::endl;
-					// for (int i=0; i<intersects.size(); ++i)
-					// {
-					// 	std::cout << "Intersected " << i << ":(" << intersects[i][0] << "," << intersects[i][1] << std::endl;
-					// }
-
-
-					// Extract the corners from the intersected points
-					std::vector<Eigen::Vector3f> corners;
-					for (int i=0; i< intersects.size(); ++i)
-					{
-						if(!isnan(intersects[i](0)) || !isnan(intersects[i](1)))
-						{
-							// // Visualize valid intersected points
-							// ptsMsg.data.push_back(intersects[i](0)), ptsMsg.data.push_back(table_cloud->points[max_z_id].y), ptsMsg.data.push_back(intersects[i](1));									
-
-							if(intersects[i](0) >= max_x-step_size && intersects[i](0) <= max_x+step_size || intersects[i](0) <= min_x + step_size && intersects[i](0) >= min_x - step_size)
+							if(intersects[i](1) >= max_z-step_size && intersects[i](1) <= max_z+step_size || intersects[i](1) <= min_z + step_size && intersects[i](1) >= min_z - step_size)
 							{
-								if(intersects[i](1) >= max_z-step_size && intersects[i](1) <= max_z+step_size || intersects[i](1) <= min_z + step_size && intersects[i](1) >= min_z - step_size)
+								Eigen::Vector3f corner (intersects[i](0), table_cloud->points[max_z_id].y, intersects[i](1));
+								if (corners.size() == 0)
 								{
-									Eigen::Vector3f corner (intersects[i](0), table_cloud->points[max_z_id].y, intersects[i](1));
-									if (corners.size() == 0)
+									corners.push_back(corner);
+									// corner visualization
+									ptsMsg2.data.push_back(intersects[i](0)), ptsMsg2.data.push_back(table_cloud->points[max_z_id].y), ptsMsg2.data.push_back(intersects[i](1));									
+									continue;
+								}	
+								bool isRepeat = false;									
+								for (int j=0; j<corners.size(); ++j)
+								{
+									if(corner(0) >= corners[j](0) - 2*step_size && corner(0) <= corners[j](0) + 2*step_size && corner(2) >= corners[j](2) - 2*step_size && corner(2) <= corners[j](2) + 2*step_size)
 									{
-										corners.push_back(corner);
-										// corner visualization
-										ptsMsg2.data.push_back(intersects[i](0)), ptsMsg2.data.push_back(table_cloud->points[max_z_id].y), ptsMsg2.data.push_back(intersects[i](1));									
-										continue;
+										isRepeat = true;
+										break;
 									}	
-									bool isRepeat = false;									
-									for (int j=0; j<corners.size(); ++j)
-									{
-										if(corner(0) >= corners[j](0) - 2*step_size && corner(0) <= corners[j](0) + 2*step_size && corner(2) >= corners[j](2) - 2*step_size && corner(2) <= corners[j](2) + 2*step_size)
-										{
-											isRepeat = true;
-											break;
-										}	
-									}		
-									if(!isRepeat)
-									{
-										corners.push_back(corner);
-										// corner visualization
-										ptsMsg2.data.push_back(intersects[i](0)), ptsMsg2.data.push_back(table_cloud->points[max_z_id].y), ptsMsg2.data.push_back(intersects[i](1));																				
-									}							
-								}
+								}		
+								if(!isRepeat)
+								{
+									corners.push_back(corner);
+									// corner visualization
+									ptsMsg2.data.push_back(intersects[i](0)), ptsMsg2.data.push_back(table_cloud->points[max_z_id].y), ptsMsg2.data.push_back(intersects[i](1));																				
+								}							
 							}
 						}
 					}
-					std::cout << "[DEBUG] The number of coners: " << corners.size() << std::endl; 
-					for(int i=0; i< corners.size();++i)
-					{
-						std::cout << "[DEBUG] corner " << i << ":(" << corners[i](0) << "," << corners[i](2) << ")\n";
-					}
+				}	//end of corner extraction
+				std::cout << "[DEBUG] The number of coners: " << corners.size() << std::endl; 
+				// for(int i=0; i< corners.size();++i)
+				// {
+				// 	std::cout << "[DEBUG] corner " << i << ":(" << corners[i](0) << "," << corners[i](2) << ")\n";
+				// }
 
-
-
-
-				}
 
 			}
-
+			else
+			{
+				std::cout << "[DEBUG] Unable to detect the contour of the table" << std::endl;				
+			}
 		}
-	}
+		else
+		{
+			std::cout << "[DEBUG] Unable to find a table fits the constrains. Please check the type of table." << std::endl;
+		}
+	}	//end of table cloud
 
 
 
