@@ -12,8 +12,10 @@
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/segmentation/region_growing.h>
+#include "pcl/surface/convex_hull.h"
 
-ros::Publisher pub_obj, pub_filtered, pub_pts,pub_normals, pub_pts2; 
+
+ros::Publisher pub_obj, pub_filtered, pub_pts,pub_normals, pub_pts2, pub_line; 
 
 // Parameters for image processing
 float leaf_size = 0.1;
@@ -21,6 +23,24 @@ int meanK = 50;
 float radius = 30.0f;
 float p = 1.0;
 float k = 1.0;
+
+/** @brief return the index of the minimul value
+ * 
+ */
+int findMinIndex(std::vector<float> vect)
+{
+	int id=0;
+	float min=vect[0];
+	for(int i=1; i<vect.size(); ++i)
+	{
+		if (vect[i] < min)
+		{
+			id = i;
+			min =vect[i];
+		}
+	}
+	return id;
+}
 
 /** @brief The callback process the raw depth information to decide whether the ramp is safe to transver.
  */
@@ -136,31 +156,31 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 		// 	continue;
 
 
-		// [DEBUG] cluster visualization
-		if(i==0)
-		{
-			// std::cout << "number of points in the " << i << " clusters: " << cluster_cloud->points.size() << std::endl;
-			for (int j=0; j<cluster_cloud->points.size(); ++j)
-			{
-				ptsMsg.data.push_back(cluster_cloud->points[j].x);
-				ptsMsg.data.push_back(cluster_cloud->points[j].y);
-				ptsMsg.data.push_back(cluster_cloud->points[j].z);
-			}
-		}
-		else if(i==1)
-		{
-			// std::cout << "number of points in the " << i << " clusters: " << cluster_cloud->points.size() << std::endl;
-			for (int j=0; j<cluster_cloud->points.size(); ++j)
-			{
-				ptsMsg2.data.push_back(cluster_cloud->points[j].x);
-				ptsMsg2.data.push_back(cluster_cloud->points[j].y);
-				ptsMsg2.data.push_back(cluster_cloud->points[j].z);
-			}
-		}
-		else
-		{
-			std::cout << "Unable to visualize the cluster >=3" << ", now is cluster:" << i << std::endl;
-		}	
+		// // [DEBUG] cluster visualization
+		// if(i==0)
+		// {
+		// 	// std::cout << "number of points in the " << i << " clusters: " << cluster_cloud->points.size() << std::endl;
+		// 	for (int j=0; j<cluster_cloud->points.size(); ++j)
+		// 	{
+		// 		ptsMsg.data.push_back(cluster_cloud->points[j].x);
+		// 		ptsMsg.data.push_back(cluster_cloud->points[j].y);
+		// 		ptsMsg.data.push_back(cluster_cloud->points[j].z);
+		// 	}
+		// }
+		// else if(i==1)
+		// {
+		// 	// std::cout << "number of points in the " << i << " clusters: " << cluster_cloud->points.size() << std::endl;
+		// 	for (int j=0; j<cluster_cloud->points.size(); ++j)
+		// 	{
+		// 		ptsMsg2.data.push_back(cluster_cloud->points[j].x);
+		// 		ptsMsg2.data.push_back(cluster_cloud->points[j].y);
+		// 		ptsMsg2.data.push_back(cluster_cloud->points[j].z);
+		// 	}
+		// }
+		// else
+		// {
+		// 	std::cout << "Unable to visualize the cluster >=3" << ", now is cluster:" << i << std::endl;
+		// }	
 
 
 		// calculate the average normals of the clusters
@@ -191,6 +211,8 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 			groundCluster = i;
 			continue;
 		}
+
+		std::cout << std::endl;
 		
 		//Detect the possible inclined plane
 		if(fabs(avgNormals[i][1]) < 0.8)	// normal is not perpendicular to the ground
@@ -214,16 +236,123 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 			// << coefficients->values[0] <<"," <<coefficients->values[1] << "," <<coefficients->values[2] << std::endl;
 
 			// Extracts the inliers (keep only the inliers)
+			if (inliers->indices.size() < 10)
+				continue;
+
     		pcl::ExtractIndices<pcl::PointXYZ> ext;
-			if(inliers->indices.size() > 10)
+
+			// keep the inliers
+			std::cout << "[DEBUG] potential inclined plane found. Cluster:" << i << std::endl;
+			inclineCluster = i;
+			ext.setInputCloud(cluster_cloud);
+			ext.setIndices(inliers);
+			ext.setNegative(false);
+			ext.filter(*incline_cloud);
+
+			// // remove the outliers with statistical outlier removal filter
+			// pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+			// sor.setInputCloud(incline_cloud);
+			// sor.setMeanK(10);
+			// sor.setStddevMulThresh(1.0);
+			// sor.filter(*incline_cloud);
+
+			//create a Convex Hull representation
+			pcl::PointCloud<pcl::PointXYZ>::Ptr hull_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+			pcl::ConvexHull<pcl::PointXYZ> hull;
+			hull.setInputCloud(incline_cloud);
+			hull.reconstruct(*hull_cloud);
+			std::cout <<"[DEBUG] # of hull points:" << hull_cloud->points.size() << std::endl;
+
+			if(hull_cloud->points.size() == 0)
+				continue;
+
+			// visualize the convex hull (contour and points)
+			for(int i=0; i<hull_cloud->points.size(); ++i)
 			{
-				std::cout << "[DEBUG] potential inclined plane found. Cluster:" << i << std::endl;
-				inclineCluster = i;
-				ext.setInputCloud(cluster_cloud);
-				ext.setIndices(inliers);
-				ext.setNegative(false);
-				ext.filter(*incline_cloud);
+				ptsMsg2.data.push_back(hull_cloud->points[i].x); ptsMsg2.data.push_back(hull_cloud->points[i].y); ptsMsg2.data.push_back(hull_cloud->points[i].z); 						
+				lineMsg.data.push_back(hull_cloud->points[i].x); lineMsg.data.push_back(hull_cloud->points[i].y); lineMsg.data.push_back(hull_cloud->points[i].z); 	
 			}
+
+			// calculate the slope between two consecutive hull points
+			std::vector<Eigen::Vector3f> directions;
+			for(int i=0; i<hull_cloud->points.size(); ++i)
+			{
+				Eigen::Vector3f direction;
+				pcl::PointXYZ point1, point2;				
+				if (i==hull_cloud->points.size()-1)
+				{
+					point2 = hull_cloud->points[0];
+					point1 = hull_cloud->points[i];				
+				}
+				else
+				{
+					point2 = hull_cloud->points[i+1];
+					point1 = hull_cloud->points[i];
+				}
+				float mag = sqrt(pow(point2.x-point1.x, 2)+pow(point2.y-point1.y, 2)+pow(point2.z-point1.z, 2));
+				direction << point2.x-point1.x, point2.y-point1.y, point2.z-point1.z;
+				direction /= mag;
+				directions.push_back(direction);
+			}
+
+			// calculate the dot of the two consecutive directions
+			std::vector<float> dots;
+			for(int i=0; i<directions.size(); ++i)
+			{
+				float product;
+				if (i==directions.size()-1)
+				{
+					product = directions[i].dot(directions[0]);			
+				}
+				else
+				{
+					product = directions[i].dot(directions[i+1]);			
+
+				}
+				dots.push_back(product);
+				//std::cout << i << "dot:" << product << std::endl;
+			}
+			// for(int i=0; i<tmp.size();++i)
+			// {
+			// 	std::cout << i <<":" << tmp[i] <<std::endl;
+			// }
+			// std::cout <<findMinIndex(tmp);
+
+
+			std::vector<int> cornerId;
+			std::vector<float> tmp(dots);
+			cornerId.push_back(findMinIndex(tmp));			
+			tmp[cornerId[0]] = 100;
+			cornerId.push_back(findMinIndex(tmp));
+			tmp[cornerId[1]] = 100;
+			cornerId.push_back(findMinIndex(tmp));
+			tmp[cornerId[2]] = 100;
+			cornerId.push_back(findMinIndex(tmp));
+			tmp[cornerId[3]] = 100;	
+			// std::cout << "1:" << dots[cornerId[0]]<<std::endl;				
+			// std::cout << "2:" << dots[cornerId[1]]<<std::endl;				
+			// std::cout << "3:" << dots[cornerId[2]]<<std::endl;				
+			// std::cout << "4:" << dots[cornerId[3]]<<std::endl;		
+			// std::cout << "id1:" << cornerId[0]<<std::endl;				
+			// std::cout << "id2:" << cornerId[1]<<std::endl;				
+			// std::cout << "id3:" << cornerId[2]<<std::endl;				
+			// std::cout << "id4:" << cornerId[3]<<std::endl;	
+
+			// visualize the corners
+			std::vector<pcl::PointXYZ> corners;
+			for (int i=0; i<cornerId.size(); ++i)
+			{
+				if(cornerId[i] == hull_cloud->points.size()-1)
+					corners.push_back(hull_cloud->points[0]);
+				else
+					corners.push_back(hull_cloud->points[cornerId[i]+1]);
+				ptsMsg.data.push_back(corners[i].x); ptsMsg.data.push_back(corners[i].y); ptsMsg.data.push_back(corners[i].z); 						;
+			}
+
+
+
+
+
 		}
 
 		std::cout <<std::endl;
@@ -248,7 +377,7 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	pub_pts.publish(ptsMsg);
 	pub_normals.publish(normalsMsg);
 	pub_pts2.publish(ptsMsg2);
-	// pub_line.publish(lineMsg);
+	pub_line.publish(lineMsg);
 
 }
 
@@ -360,7 +489,7 @@ int main (int argc, char **argv)
     pub_pts= nh.advertise<std_msgs::Float32MultiArray>("pointInfo",1);
 	pub_pts2 = nh.advertise<std_msgs::Float32MultiArray>("pointInfo2", 1);
 	pub_normals = nh.advertise<std_msgs::Float32MultiArray>("normalsInfo", 1);
-	// pub_line = nh.advertise<std_msgs::Float32MultiArray>("lineInfo", 1);
+	pub_line = nh.advertise<std_msgs::Float32MultiArray>("lineInfo", 1);
 
 
     ros::spin();

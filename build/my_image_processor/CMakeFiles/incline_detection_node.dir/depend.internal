@@ -325,10 +325,12 @@ my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_n
  /usr/include/pcl-1.8/pcl/common/impl/eigen.hpp
  /usr/include/pcl-1.8/pcl/common/impl/io.hpp
  /usr/include/pcl-1.8/pcl/common/impl/projection_matrix.hpp
+ /usr/include/pcl-1.8/pcl/common/impl/transforms.hpp
  /usr/include/pcl-1.8/pcl/common/io.h
  /usr/include/pcl-1.8/pcl/common/point_tests.h
  /usr/include/pcl-1.8/pcl/common/projection_matrix.h
  /usr/include/pcl-1.8/pcl/common/time.h
+ /usr/include/pcl-1.8/pcl/common/transforms.h
  /usr/include/pcl-1.8/pcl/console/print.h
  /usr/include/pcl-1.8/pcl/conversions.h
  /usr/include/pcl-1.8/pcl/correspondence.h
@@ -442,6 +444,12 @@ my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_n
  /usr/include/pcl-1.8/pcl/segmentation/impl/sac_segmentation.hpp
  /usr/include/pcl-1.8/pcl/segmentation/region_growing.h
  /usr/include/pcl-1.8/pcl/segmentation/sac_segmentation.h
+ /usr/include/pcl-1.8/pcl/surface/boost.h
+ /usr/include/pcl-1.8/pcl/surface/convex_hull.h
+ /usr/include/pcl-1.8/pcl/surface/impl/convex_hull.hpp
+ /usr/include/pcl-1.8/pcl/surface/impl/reconstruction.hpp
+ /usr/include/pcl-1.8/pcl/surface/qhull.h
+ /usr/include/pcl-1.8/pcl/surface/reconstruction.h
  /usr/include/x86_64-linux-gnu/bits/mman-linux.h
  /usr/include/x86_64-linux-gnu/bits/mman-shared.h
  /usr/include/x86_64-linux-gnu/bits/mman.h

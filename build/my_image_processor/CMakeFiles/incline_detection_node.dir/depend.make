@@ -324,10 +324,12 @@ my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_n
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/eigen.hpp
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/io.hpp
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/projection_matrix.hpp
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/transforms.hpp
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/io.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/point_tests.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/projection_matrix.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/time.h
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/common/transforms.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/console/print.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/conversions.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/correspondence.h
@@ -441,6 +443,12 @@ my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_n
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/segmentation/impl/sac_segmentation.hpp
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/segmentation/region_growing.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/segmentation/sac_segmentation.h
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/surface/boost.h
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/surface/convex_hull.h
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/surface/impl/convex_hull.hpp
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/surface/impl/reconstruction.hpp
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/surface/qhull.h
+my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/pcl-1.8/pcl/surface/reconstruction.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/x86_64-linux-gnu/bits/mman-linux.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/x86_64-linux-gnu/bits/mman-shared.h
 my_image_processor/CMakeFiles/incline_detection_node.dir/src/incline_detection_node.cpp.o: /usr/include/x86_64-linux-gnu/bits/mman.h
