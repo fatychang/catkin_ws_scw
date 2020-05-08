@@ -75,14 +75,17 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	// compute the features
 	ne.compute(*cloud_normals);
     //std::cout << "[DEBUG]: the number of points in normal cloud" << cloud_normals->points.size() << std::endl;
-    // std::cout << "[DEBUG]: the normal of points in normal cloud" << cloud_normals->points[98].normal_x <<" " << cloud_normals->points[98].normal_y
-	// << " "<< cloud_normals->points[98].normal_z << std::endl;
-	// std::cout << "[DEBUG]: the position of points in normal cloud" << filtered_cloud->points[98].x<<" " << filtered_cloud->points[98].y
-	// << " "<< filtered_cloud->points[98].z << std::endl;
+
 
 	// visualize the normals
 	for (int i=0; i< filtered_cloud->points.size(); ++i)
 	{
+		// std::cout << "[DEBUG]: (" << cloud_normals->points[i].normal_x <<" " << cloud_normals->points[i].normal_y
+		// 	<< " "<< cloud_normals->points[i].normal_z << ")" << std::endl;
+		
+		if(isnan(cloud_normals->points[i].normal_x) || isnan(cloud_normals->points[i].normal_y) || isnan(cloud_normals->points[i].normal_z))
+			continue;
+		
 		float len = 0.5;
 		normalsMsg.data.push_back(filtered_cloud->points[i].x);
 		normalsMsg.data.push_back(filtered_cloud->points[i].y);
@@ -92,6 +95,8 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 		normalsMsg.data.push_back(cloud_normals->points[i].normal_z * len + filtered_cloud->points[i].z);
 	}
 
+
+	// Merge points that are close in terms of smoothness and curvature
 	pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> reg;
 	reg.setMinClusterSize(20);
 	reg.setMaxClusterSize(1000);
@@ -99,20 +104,20 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	reg.setNumberOfNeighbours(radius);
 	reg.setInputCloud(filtered_cloud);
 	reg.setInputNormals(cloud_normals);
-	reg.setSmoothModeFlag(0.5 / 180 * M_PI);
-	reg.setCurvatureThreshold(0.5);
+	reg.setSmoothModeFlag(5 / 180 * M_PI);
+	reg.setCurvatureThreshold(2);
 
 	std::vector<pcl::PointIndices> clusters;
 	reg.extract(clusters);
 
 	int numOfClusters = clusters.size();
 	std::cout << "number of clusters: " << numOfClusters << std::endl;
-	// std::cout << "number of points in the clusters: " << clusters[0].indices.size() << std::endl;
-	// std::cout << "number of points in the clusters: " << clusters[1].indices.size() << std::endl;
+	std::cout << "number of points in the clusters: " << clusters[0].indices.size() << std::endl;
+	std::cout << "number of points in the clusters: " << clusters[1].indices.size() << std::endl;
 
 	pcl::ExtractIndices<pcl::PointXYZ> extract;
 	std::vector<Eigen::Vector3f> avgNormals;
-	for (int i=0; i<numOfClusters; ++i)
+	for (int i=0; i<clusters.size(); ++i)
 	{
 		//Extract the indices from the clusters
 		pcl::PointIndices::Ptr tmp_cluster (new pcl::PointIndices);
@@ -120,10 +125,38 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 		tmp_cluster->indices = clusters[i].indices;
 		extract.setInputCloud(filtered_cloud);
 		extract.setIndices(tmp_cluster);
-		extract.setNegative(false);
+		extract.setNegative(true);
 		extract.filter(*incline_cloud);
 
-		std::cout << "number of points in the clusters" << i << " " << clusters[i].indices.size() << std::endl;
+		std::cout << "number of points in the clusters " << i << " " << clusters[i].indices.size() << std::endl;
+
+
+		//[DEBUG] cluster visualization
+		// if(i==0)
+		// {
+		// 	// std::cout << "number of points in the " << i << " clusters: " << incline_cloud->points.size() << std::endl;
+		// 	for (int j=0; j<incline_cloud->points.size(); ++j)
+		// 	{
+		// 		ptsMsg.data.push_back(incline_cloud->points[j].x);
+		// 		ptsMsg.data.push_back(incline_cloud->points[j].y);
+		// 		ptsMsg.data.push_back(incline_cloud->points[j].z);
+		// 	}
+		// }
+		// else if(i==1)
+		// {
+		// 	// std::cout << "number of points in the " << i << " clusters: " << incline_cloud->points.size() << std::endl;
+		// 	for (int j=0; j<incline_cloud->points.size(); ++j)
+		// 	{
+		// 		ptsMsg2.data.push_back(incline_cloud->points[j].x);
+		// 		ptsMsg2.data.push_back(incline_cloud->points[j].y);
+		// 		ptsMsg2.data.push_back(incline_cloud->points[j].z);
+		// 	}
+		// }
+		// else
+		// {
+		// 	std::cout << "Unable to visualize the cluster >=3" << ", now is cluster:" << i << std::endl;
+		// }	
+
 
 
 		// calculate the average normals of the clusters
@@ -131,65 +164,28 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 		int counter=0;
 		for (int j=0; j<clusters[i].indices.size(); ++j)
 		{
-			// std::cout << " " << cloud_normals->points[clusters[i].indices[j]].normal_x << std::endl;
-			if ( !isnan(cloud_normals->points[clusters[i].indices[j]].normal_x))
-			{
-				if (!isnan(cloud_normals->points[clusters[i].indices[j]].normal_y))
-				{
-					if (!isnan(cloud_normals->points[clusters[i].indices[j]].normal_z))
-					{
-						tmp(0) += cloud_normals->points[clusters[i].indices[j]].normal_x;
-						tmp(1) += cloud_normals->points[clusters[i].indices[j]].normal_y;
-						tmp(2) += cloud_normals->points[clusters[i].indices[j]].normal_z;
-						counter ++;
-						//std::cout << "( " << cloud_normals->points[clusters[i].indices[j]].normal_x << ", " << cloud_normals->points[clusters[i].indices[j]].normal_y << ", " << cloud_normals->points[clusters[i].indices[j]].normal_z << std::endl;
-					}					
-				}
-			}
+			// Exclude points that have nan normal
+			if(isnan(cloud_normals->points[clusters[i].indices[j]].normal_x) || isnan(cloud_normals->points[clusters[i].indices[j]].normal_y) || isnan(cloud_normals->points[clusters[i].indices[j]].normal_z))
+				continue;
+			
+			tmp(0) += cloud_normals->points[clusters[i].indices[j]].normal_x;
+			tmp(1) += cloud_normals->points[clusters[i].indices[j]].normal_y;
+			tmp(2) += cloud_normals->points[clusters[i].indices[j]].normal_z;
+			counter ++;
 		}
 		// std::cout << "counter: " << counter << std::endl;
 		avgNormals.push_back(tmp /= counter);
-		std::cout << "avg Normal in cluster " << i << " :" << avgNormals[i] << std::endl;
+		std::cout << "[DEBUG] avg Normal in cluster " << i << " :(" << avgNormals[i][0] << "," << avgNormals[i][1] << "," << avgNormals[i][2] << ")" << std::endl;
 
-		// std::vector<int> vote_clusters;
-		// for(int i=0; i<avgNormals.size(); ++i)
-		// {
-		// 	vote_clusters.push_back(0);
-		// 	if(avgNormals[i](0) > 0.3)
-		// 		vote_clusters[i] ++;
-		// 	if(avgNormals[i](1) > 0.3)
-		// 		vote_clusters[i] ++;
-		// 	if(avgNormals[i](2) > 0.3)
-		// 		vote_clusters[i] ++;											
-		// }
-
-
-
-		//cluster visualization
-		if(i==0)
+		//Remove the ground plane
+		if(fabs(avgNormals[i][1]) > 0.8 && fabs(avgNormals[i][0]) < 0.1 && fabs(avgNormals[i][2]) < 0.1)
 		{
-			// std::cout << "number of points in the " << i << " clusters: " << incline_cloud->points.size() << std::endl;
-			for (int j=0; j<incline_cloud->points.size(); ++j)
-			{
-				ptsMsg.data.push_back(incline_cloud->points[j].x);
-				ptsMsg.data.push_back(incline_cloud->points[j].y);
-				ptsMsg.data.push_back(incline_cloud->points[j].z);
-			}
+			std::cout << "[DEBUG] Ground plane removed. cluster: " << i << std::endl;
+			continue;
 		}
-		else if(i==1)
-		{
-			// std::cout << "number of points in the " << i << " clusters: " << incline_cloud->points.size() << std::endl;
-			for (int j=0; j<incline_cloud->points.size(); ++j)
-			{
-				ptsMsg2.data.push_back(incline_cloud->points[j].x);
-				ptsMsg2.data.push_back(incline_cloud->points[j].y);
-				ptsMsg2.data.push_back(incline_cloud->points[j].z);
-			}
-		}
-		else
-		{
-			std::cout << "Unable to visualize the cluster >=3" << ", now is cluster:" << i << std::endl;
-		}		
+
+
+	
 	}
 	
 	
