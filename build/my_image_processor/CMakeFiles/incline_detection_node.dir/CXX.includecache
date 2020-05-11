@@ -29,6 +29,8 @@ pcl/segmentation/region_growing.h
 -
 pcl/surface/convex_hull.h
 /media/js/data/WFH/Ubuntu/catkin_ws_scw/src/my_image_processor/src/pcl/surface/convex_hull.h
+pcl/common/common.h
+-
 
 /opt/ros/melodic/include/pcl_conversions/pcl_conversions.h
 vector

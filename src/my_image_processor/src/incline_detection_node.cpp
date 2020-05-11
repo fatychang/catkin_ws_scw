@@ -13,19 +13,24 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/segmentation/region_growing.h>
 #include "pcl/surface/convex_hull.h"
+#include <pcl/common/common.h>		//for distance.h
 
+#define PI 3.14159265
 
 ros::Publisher pub_obj, pub_filtered, pub_pts,pub_normals, pub_pts2, pub_line; 
 
 // Parameters for image processing
 float leaf_size = 0.1;
-int meanK = 50;
+int meanK1 = 50;
+int meanK2 = 10;
 float radius = 30.0f;
-float p = 1.0;
+float p = 10.0;
 float k = 1.0;
 
 /** @brief return the index of the minimul value
  * 
+ * @param vect a std vector of floating points 
+ * @return the index of the minimul value is returned
  */
 int findMinIndex(std::vector<float> vect)
 {
@@ -40,6 +45,72 @@ int findMinIndex(std::vector<float> vect)
 		}
 	}
 	return id;
+}
+
+/** @brief return the index of the minimul value.
+ * 
+ * @param vect a std vector of pcl::PointXYZ
+ * @param axis the axis where we are comparing. the argument is expected to 'x'(0), 'y'(1) or 'z'(2)
+ * @return the index of the minimul value is returned
+ */
+int findMinIndex(std::vector<pcl::PointXYZ> vect, int axis)
+{
+	int id=0;
+	if (axis=0)
+	{
+		float min = vect[0].x;
+		for(int i=1; i<vect.size(); i++)
+		{
+			if (vect[i].x < min)
+			{
+				min = vect[i].x;
+				id = i;
+			}
+		}
+	}
+	else if (axis=1)
+	{
+		float min = vect[0].y;
+		for(int i=1; i<vect.size(); i++)
+		{
+			if (vect[i].y < min)
+			{
+				min = vect[i].y;
+				id = i;
+			}
+		}
+	}
+	else if (axis=2)
+	{
+		float min = vect[0].z;
+		for(int i=1; i<vect.size(); i++)
+		{
+			if (vect[i].z < min)
+			{
+				min = vect[i].z;
+				id = i;
+			}
+		}
+	}
+	else
+	{
+		std::cout << "[ERROR] Invalid axis argument. It must be either 'x', 'y' or 'z'." << std::endl;
+		id = -1;
+	}
+
+	return id;
+}
+
+/** @brief return the euclidean distance between two given points in 3D.
+ * 
+ * @param p1 points1 in the type of pcl::PointXYZ
+ * @param p2 points1 in the type of pcl::PointXYZ
+ * @return the euclidean distance between two points in 3D.
+ */
+float findDistance(pcl::PointXYZ p1, pcl::PointXYZ p2)
+{
+	float diff_x = p2.x - p1.x, diff_y = p2.y - p1.y, diff_z = p2.z - p1.z;
+	return (sqrt(diff_x*diff_x + diff_y*diff_y + diff_z*diff_z));
 }
 
 /** @brief The callback process the raw depth information to decide whether the ramp is safe to transver.
@@ -74,7 +145,7 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 	// remove the outliers with statistical outlier removal filter
 	pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
 	sor.setInputCloud(filtered_cloud);
-	sor.setMeanK(meanK);
+	sor.setMeanK(meanK1);
 	sor.setStddevMulThresh(1.0);
 	sor.filter(*filtered_cloud);
     // std::cout << "[DEBUG]: the number of points:" << filtered_cloud->points.size() << std::endl;
@@ -249,12 +320,12 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 			ext.setNegative(false);
 			ext.filter(*incline_cloud);
 
-			// // remove the outliers with statistical outlier removal filter
-			// pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-			// sor.setInputCloud(incline_cloud);
-			// sor.setMeanK(10);
-			// sor.setStddevMulThresh(1.0);
-			// sor.filter(*incline_cloud);
+			// remove the outliers with statistical outlier removal filter
+			pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+			sor.setInputCloud(incline_cloud);
+			sor.setMeanK(meanK2);
+			sor.setStddevMulThresh(1.0);
+			sor.filter(*incline_cloud);
 
 			//create a Convex Hull representation
 			pcl::PointCloud<pcl::PointXYZ>::Ptr hull_cloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -321,24 +392,13 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 
 			std::vector<int> cornerId;
 			std::vector<float> tmp(dots);
-			cornerId.push_back(findMinIndex(tmp));			
-			tmp[cornerId[0]] = 100;
-			cornerId.push_back(findMinIndex(tmp));
-			tmp[cornerId[1]] = 100;
-			cornerId.push_back(findMinIndex(tmp));
-			tmp[cornerId[2]] = 100;
-			cornerId.push_back(findMinIndex(tmp));
-			tmp[cornerId[3]] = 100;	
-			// std::cout << "1:" << dots[cornerId[0]]<<std::endl;				
-			// std::cout << "2:" << dots[cornerId[1]]<<std::endl;				
-			// std::cout << "3:" << dots[cornerId[2]]<<std::endl;				
-			// std::cout << "4:" << dots[cornerId[3]]<<std::endl;		
-			// std::cout << "id1:" << cornerId[0]<<std::endl;				
-			// std::cout << "id2:" << cornerId[1]<<std::endl;				
-			// std::cout << "id3:" << cornerId[2]<<std::endl;				
-			// std::cout << "id4:" << cornerId[3]<<std::endl;	
+			for(int i=0; i<4; ++i)
+			{
+				cornerId.push_back(findMinIndex(tmp));			
+				tmp[cornerId[i]] = 100;
+			}
 
-			// visualize the corners
+			// update the corners
 			std::vector<pcl::PointXYZ> corners;
 			for (int i=0; i<cornerId.size(); ++i)
 			{
@@ -346,9 +406,70 @@ void inclineCallback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg)
 					corners.push_back(hull_cloud->points[0]);
 				else
 					corners.push_back(hull_cloud->points[cornerId[i]+1]);
+				
+				// visualize the corner
 				ptsMsg.data.push_back(corners[i].x); ptsMsg.data.push_back(corners[i].y); ptsMsg.data.push_back(corners[i].z); 						;
 			}
 
+			// get the width of the ramp
+			std::vector<float> rampLengths;
+			rampLengths.push_back(findDistance(corners[1], corners[0]));
+			rampLengths.push_back(findDistance(corners[2], corners[1]));
+			rampLengths.push_back(findDistance(corners[3], corners[2]));
+			rampLengths.push_back(findDistance(corners[0], corners[3]));
+			std::cout << "[DEBUG] The length of the rectangle ramp: (" << rampLengths[0] << ", " << rampLengths[1] << ", "
+						<< rampLengths[2] << ", " << rampLengths[3] << std::endl;;
+
+
+			// identify the two corner points that are closer to the camera (at the loanding position)
+			// NOTED, the y value is upside down in the rviz therefore minimul y means highest point in the view
+			std::vector<int> landingId, rampId;		// stores the id of the corner points which have the smaller y (at the ramp)
+			std::vector<pcl::PointXYZ> tmp2(corners);
+			pcl::PointXYZ discardPt; discardPt.x=1000, discardPt.y=1000, discardPt.z=1000;
+			for (int i=0; i<2; ++i)
+			{
+				landingId.push_back(findMinIndex(tmp2, 1)); // the second argument is to indicate the axis. x=0, y=1, z=2
+				tmp2[landingId[i]] = discardPt;
+				//std::cout << "index: " << landingId[i] << std::endl;
+			}
+			
+			// calculate the centers Cn, Cf of the flush transitions of the ramp to landings (simplified)
+			Eigen::Vector3f cn, cf;
+			cf << (corners[landingId[0]].x + corners[landingId[1]].x)/2, 
+					(corners[landingId[0]].y + corners[landingId[1]].y)/2, 
+					(corners[landingId[0]].z + corners[landingId[1]].z)/2;
+			ptsMsg.data.push_back(cf(0)); ptsMsg.data.push_back(cf(1)); ptsMsg.data.push_back(cf(2));
+			
+			for(int i=0; i<4; ++i)
+			{
+				if(i == landingId[0] || i== landingId[1])
+					continue;
+				rampId.push_back(i);
+			}			 			
+			cn << (corners[rampId[0]].x + corners[rampId[1]].x)/2, 
+					(corners[rampId[0]].y + corners[rampId[1]].y)/2, 
+					(corners[rampId[0]].z + corners[rampId[1]].z)/2;	
+			ptsMsg.data.push_back(cn(0)); ptsMsg.data.push_back(cn(1)); ptsMsg.data.push_back(cn(2));
+
+
+			////// Finding Navigable Ramp
+			Eigen::Vector3f rampSlope, rampRun, mag;
+			float angleSlope;
+			mag << pow((cn(0)-cf(0)),2), pow((cn(1)-cf(1)),2), pow((cn(2)-cf(2)),2);
+			rampSlope = (cf-cn)/ sqrt(mag(0)+mag(1)+mag(2));
+			rampRun << cn(0), cn(1), cn(2)+1;
+			rampRun = rampRun/ sqrt(rampRun(0)+rampRun(1)+rampRun(2));
+			angleSlope = acos(rampSlope.dot(rampRun));  		//[rad]
+			std::cout << "angleSlope (deg.):" << angleSlope*180/PI << std::endl;
+
+			// visualize the vector rampRun and rampSlope
+			normalsMsg.data.push_back(cn(0)), normalsMsg.data.push_back(cn(1)), normalsMsg.data.push_back(cn(2));
+			normalsMsg.data.push_back(cn(0)+rampSlope(0)), normalsMsg.data.push_back(cn(1)+rampSlope(1)), normalsMsg.data.push_back(cn(2)+rampSlope(2));
+			normalsMsg.data.push_back(cn(0)), normalsMsg.data.push_back(cn(1)), normalsMsg.data.push_back(cn(2));
+			normalsMsg.data.push_back(cn(0)+rampRun(0)), normalsMsg.data.push_back(cn(1)+rampRun(1)), normalsMsg.data.push_back(cn(2)+rampRun(2));
+
+			// further checking of the ramp candidate
+			
 
 
 
@@ -391,7 +512,8 @@ static void showUsage(std::string name)
 			<< "\t -h, --help \t\t Show this help message\n"
 			<< "\t -l, --leaf \t\t leaf_size size of the VoxelGrid filter (Default is 0.1)\n"
 			<< "\t -r, --radius \t\t \n" 
-            << "\t -p, --param \t\t tmp param for tuning params"<<std::endl;
+            << "\t -k1, --meanK1 \t\t mean K for the first round outliers removal (Default is 50)"
+            << "\t -k2, --meanK2 \t\t mean K for the second round outliers removal (Default is 10)"<<std::endl;
 }
 
 /** @brief Incline detection node identifies the location of the ramp and decides whether it's safe to traversal.
@@ -418,6 +540,14 @@ int main (int argc, char **argv)
 		{
 			radius = std::stof(argv[i+1]);
 		}
+		else if((arg == "-k1") || (arg == "-meanK1"))
+		{
+			meanK1 = std::stof(argv[i+1]);
+		}
+		else if((arg == "-k2") || (arg == "-meanK2"))
+		{
+			meanK2 = std::stof(argv[i+1]);
+		}		
         else if((arg == "-p") || (arg == "-param"))
 		{
 			p = std::stof(argv[i+1]);
