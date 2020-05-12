@@ -16,7 +16,7 @@ void clbk(const std_msgs::Float32MultiArray::ConstPtr &point_msg)
     points.clear();
 
     int numOfMsgs = point_msg ->data.size();
-    // ROS_INFO("numOfPoints in point1: %d", numOfMsgs/3);
+    ROS_INFO("numOfPoints in point1: %d", numOfMsgs/3);
     for (size_t i=0; i< numOfMsgs; ++i)
     {
         points.push_back(point_msg->data[i]);
